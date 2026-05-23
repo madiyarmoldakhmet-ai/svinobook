@@ -6,17 +6,13 @@ import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
 import 'views/auth_screen.dart';
 import 'views/home_screen.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Firebase.initializeApp() requires configuration which would normally be passed here.
-  // Since we haven't run flutterfire configure, we just wrap it in a try-catch for now
-  // or it will crash if not configured on web/iOS/Android.
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    print('Firebase initialization error (might need flutterfire configure): $e');
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MultiProvider(
