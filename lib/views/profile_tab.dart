@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firestore_service.dart';
 import '../utils/image_picker_helper.dart';
+import '../widgets/anime_background.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -77,159 +78,169 @@ class _ProfileTabState extends State<ProfileTab> {
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
-      return const Center(child: Text('Not logged in'));
+      return const Center(child: Text('Not logged in', style: TextStyle(color: Colors.white)));
     }
 
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.uid)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-          return const Center(child: Text('Error loading profile data'));
-        }
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.85),
+        title: const Text(
+          'PROFILE SETTINGS',
+          style: TextStyle(
+            color: Color(0xFF8B0000),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            letterSpacing: 1.2,
+          ),
+        ),
+        elevation: 0,
+      ),
+      body: AnimeBackground(
+        child: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUser.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Color(0xFF8B0000)));
+            }
+            if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+              return const Center(child: Text('Error loading profile data', style: TextStyle(color: Colors.white70)));
+            }
 
-        final data = snapshot.data!.data() as Map<String, dynamic>;
-        final currentName = data['name'] ?? data['username'] ?? 'User';
-        final photoUrl = data['photoUrl'] as String?;
+            final data = snapshot.data!.data() as Map<String, dynamic>;
+            final currentName = data['name'] ?? data['username'] ?? 'User';
+            final photoUrl = data['photoUrl'] as String?;
 
-        // Initialize the controller with the current name if it is empty
-        if (_nameController.text.isEmpty) {
-          _nameController.text = currentName;
-        }
+            if (_nameController.text.isEmpty) {
+              _nameController.text = currentName;
+            }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Stack(
-                alignment: Alignment.bottomRight,
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 70,
-                    backgroundColor: const Color(0xFF1877F2),
-                    backgroundImage: _selectedAvatarBytes != null
-                        ? MemoryImage(_selectedAvatarBytes!)
-                        : (photoUrl != null ? NetworkImage(photoUrl) : null) as ImageProvider?,
-                    child: (_selectedAvatarBytes == null && photoUrl == null)
-                        ? Text(
-                            currentName.isNotEmpty ? currentName[0].toUpperCase() : '?',
-                            style: const TextStyle(fontSize: 48, color: Colors.white, fontWeight: FontWeight.bold),
-                          )
-                        : null,
+                  const SizedBox(height: 20),
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 70,
+                        backgroundColor: const Color(0xFF8B0000),
+                        backgroundImage: _selectedAvatarBytes != null
+                            ? MemoryImage(_selectedAvatarBytes!)
+                            : (photoUrl != null ? NetworkImage(photoUrl) : null) as ImageProvider?,
+                        child: (_selectedAvatarBytes == null && photoUrl == null)
+                            ? Text(
+                                currentName.isNotEmpty ? currentName[0].toUpperCase() : '?',
+                                style: const TextStyle(fontSize: 48, color: Colors.white, fontWeight: FontWeight.bold),
+                              )
+                            : null,
+                      ),
+                      InkWell(
+                        onTap: _pickAvatar,
+                        child: const CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Color(0xFF8B0000),
+                          child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    ],
                   ),
-                  InkWell(
-                    onTap: _pickAvatar,
-                    child: const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Color(0xFF1877F2),
-                      child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                  const SizedBox(height: 32),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF8B0000), width: 0.8),
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Display Name',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _nameController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Enter your name',
+                            hintStyle: const TextStyle(color: Colors.white38),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.white30),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Email Address',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: TextEditingController(text: currentUser.email),
+                          enabled: false,
+                          style: const TextStyle(color: Colors.white70),
+                          decoration: InputDecoration(
+                            fillColor: Colors.white12,
+                            filled: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.transparent),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8B0000),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: _isSaving ? null : _saveProfile,
+                      child: _isSaving
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Save Changes',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Display Name',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your name',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFF1877F2), width: 1.5),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Email Address',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: TextEditingController(text: currentUser.email),
-                      enabled: false,
-                      decoration: InputDecoration(
-                        fillColor: const Color(0xFFF0F2F5),
-                        filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1877F2),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: _isSaving ? null : _saveProfile,
-                  child: _isSaving
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'Save Changes',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 }
