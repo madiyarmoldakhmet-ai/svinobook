@@ -15,11 +15,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _tabs = [
-    const ProjectShowcaseView(),
-    const GlobalChatTab(),
-    const DirectMessagesTab(),
-    const ProfileTab(),
+  final List<Widget> _tabs = const [
+    ProjectShowcaseView(),
+    GlobalChatTab(),
+    DirectMessagesTab(),
+    ProfileTab(),
   ];
 
   @override
@@ -38,22 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 8,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Discover',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.public),
-            label: 'Global',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Discover'),
+          BottomNavigationBarItem(icon: Icon(Icons.public), label: 'Global'),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

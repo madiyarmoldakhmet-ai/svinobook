@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../models/chat_message_model.dart';
 import '../services/firestore_service.dart';
@@ -131,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (messages.isEmpty) {
                     return const Center(
                       child: Text(
-                        "The world is empty... post something.",
+                        "No chats yet",
                         style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic),
                       ),
                     );

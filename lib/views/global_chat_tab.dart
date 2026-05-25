@@ -2,11 +2,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/chat_message_model.dart';
+import '../models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/chat_bubble.dart';
 import '../utils/image_picker_helper.dart';
 import '../widgets/anime_background.dart';
+import 'chat_screen.dart';
 
 class GlobalChatTab extends StatefulWidget {
   const GlobalChatTab({super.key});
@@ -67,6 +70,22 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
     }
   }
 
+  void _showUserSearch() {
+    final firestore = context.read<FirestoreService>();
+    final currentUserId = context.read<AuthService>().currentUser?.uid ?? '';
+    showSearch<UserModel?>(
+      context: context,
+      delegate: UserSearchDelegate(firestore: firestore, currentUserId: currentUserId),
+    ).then((selected) {
+      if (selected != null) {
+        final chatId = firestore.getChatRoomId(currentUserId, selected.id);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ChatScreen(chatId: chatId, chatName: selected.name),
+        ));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUserId = context.read<AuthService>().currentUser?.uid ?? '';
@@ -84,6 +103,13 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
             letterSpacing: 1.2,
           ),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Search Users',
+            icon: const Icon(Icons.search, color: Color(0xFF8B0000)),
+            onPressed: _showUserSearch,
+          ),
+        ],
         elevation: 0,
       ),
       body: AnimeBackground(
@@ -109,7 +135,7 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                   if (messages.isEmpty) {
                     return const Center(
                       child: Text(
-                        "The world is empty... post something.",
+                        "No chats yet",
                         style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic),
                       ),
                     );
@@ -218,6 +244,91 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// -------------------------------------------------------------------------
+// SearchDelegate for finding users and opening a direct chat
+// -------------------------------------------------------------------------
+class UserSearchDelegate extends SearchDelegate<UserModel?> {
+  final FirestoreService firestore;
+  final String currentUserId;
+
+  UserSearchDelegate({required this.firestore, required this.currentUserId});
+
+  @override
+  String? get searchFieldLabel => 'Search users...';
+
+  @override
+  TextStyle? get searchFieldStyle => const TextStyle(color: Colors.white);
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return theme.copyWith(
+      primaryColor: Colors.black.withOpacity(0.85),
+      primaryIconTheme: const IconThemeData(color: Color(0xFF8B0000)),
+      textTheme: const TextTheme(titleLarge: TextStyle(color: Colors.white, fontSize: 18)),
+      inputDecorationTheme: const InputDecorationTheme(
+        hintStyle: TextStyle(color: Colors.white54),
+        border: InputBorder.none,
+      ),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF8B0000)));
+        }
+        final docs = snapshot.data!.docs.where((d) => d.id != currentUserId).toList();
+        final users = docs.map((d) => UserModel.fromMap(d.data() as Map<String, dynamic>, d.id)).toList();
+        final filtered = query.isEmpty
+            ? users
+            : users.where((u) => u.name.toLowerCase().contains(query.toLowerCase())).toList();
+        return ListView.builder(
+          itemCount: filtered.length,
+          itemBuilder: (context, index) {
+            final user = filtered[index];
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: const Color(0xFF8B0000),
+                backgroundImage: user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+                child: user.photoUrl == null ? Text(user.name.isNotEmpty ? user.name[0].toUpperCase() : '?', style: const TextStyle(color: Colors.white)) : null,
+              ),
+              title: Text(user.name, style: const TextStyle(color: Colors.white)),
+              subtitle: Text(user.id, style: const TextStyle(color: Colors.white70)),
+              onTap: () => close(context, user),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(
+          icon: const Icon(Icons.clear, color: Color(0xFF8B0000)),
+          onPressed: () => query = '',
+        ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back, color: Color(0xFF8B0000)),
+      onPressed: () => close(context, null),
     );
   }
 }
