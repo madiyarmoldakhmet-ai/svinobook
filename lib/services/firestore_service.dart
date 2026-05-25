@@ -157,65 +157,7 @@ class FirestoreService {
             .toList());
   }
 
-  // New media-compatible sendMessage (for DMs and Group chats)
-  Future<void> sendMessage({
-    required String chatRoomId,
-    required String text,
-    Uint8List? chatImageBytes,
-    required bool isGroup,
-  }) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) throw Exception('No authenticated user');
 
-    // Fetch user details from Firestore
-    final userDoc = await _db.collection('users').doc(user.uid).get();
-    String senderName = user.email?.split('@')[0] ?? 'User';
-    if (userDoc.exists) {
-      final userData = userDoc.data();
-      if (userData != null) {
-        senderName = userData['name'] ?? userData['username'] ?? senderName;
-      }
-    }
-
-    String? imageUrl;
-    if (chatImageBytes != null) {
-      final fileName = '${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      imageUrl = await _storage.uploadImage(
-        fileBytes: chatImageBytes,
-        folder: 'chats',
-        fileName: fileName,
-      );
-    }
-
-    final batch = _db.batch();
-    final chatRef = _db.collection('chats').doc(chatRoomId);
-    final messageRef = chatRef.collection('messages').doc();
-
-    final message = ChatMessageModel(
-      id: messageRef.id,
-      senderId: user.uid,
-      senderName: senderName,
-      text: text,
-      imageUrl: imageUrl,
-      timestamp: DateTime.now(),
-      isGroup: isGroup,
-      chatRoomId: chatRoomId,
-    );
-
-    batch.set(messageRef, message.toMap());
-
-    String lastMsg = text;
-    if (lastMsg.isEmpty && imageUrl != null) {
-      lastMsg = '📷 Photo';
-    }
-
-    batch.update(chatRef, {
-      'lastMessage': lastMsg,
-      'lastUpdated': FieldValue.serverTimestamp(),
-    });
-
-    await batch.commit();
-  }
 
   // Legacy sendDirectMessage for compatibility
   Future<void> sendDirectMessage(String chatId, String senderId, String senderName, String text) async {
