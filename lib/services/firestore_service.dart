@@ -159,24 +159,50 @@ class FirestoreService {
 
 
 
-  // Legacy sendDirectMessage for compatibility
-  Future<void> sendDirectMessage(String chatId, String senderId, String senderName, String text) async {
-    final batch = _db.batch();
-    final chatRef = _db.collection('chats').doc(chatId);
-    final messageRef = chatRef.collection('messages').doc();
+  // Determine deterministic chat room ID for 1:1 chats
+  String getChatRoomId(String uid1, String uid2) {
+    final ids = [uid1, uid2]..sort();
+    return '${ids[0]}_${ids[1]}';
+  }
 
+  // Send a message (direct or group) with optional image
+  Future<void> sendMessage({
+    required String chatRoomId,
+    required String text,
+    Uint8List? chatImageBytes,
+    required bool isGroup,
+    required String senderId,
+    required String senderName,
+  }) async {
+    String? imageUrl;
+    if (chatImageBytes != null) {
+      final fileName = '${senderId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      imageUrl = await _storage.uploadImage(
+        fileBytes: chatImageBytes,
+        folder: isGroup ? 'group_chats' : 'direct_chats',
+        fileName: fileName,
+      );
+    }
+
+    final chatRef = _db.collection(isGroup ? 'group_chats' : 'chats').doc(chatRoomId);
+    final messageRef = chatRef.collection('messages').doc();
+    final batch = _db.batch();
     batch.set(messageRef, {
       'senderId': senderId,
       'senderName': senderName,
       'text': text,
+      'imageUrl': imageUrl,
       'timestamp': FieldValue.serverTimestamp(),
+      'isRead': false,
     });
-
-    batch.update(chatRef, {
+    // Update last message metadata
+    batch.set(chatRef, {
       'lastMessage': text,
       'lastUpdated': FieldValue.serverTimestamp(),
-    });
-
+      'participantIds': FieldValue.arrayUnion([senderId]),
+      'participantNames': FieldValue.arrayUnion([senderName]),
+    }, SetOptions(merge: true));
     await batch.commit();
   }
+
 }

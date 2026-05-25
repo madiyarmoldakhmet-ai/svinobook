@@ -46,6 +46,9 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() => _isSending = true);
 
     final firestore = context.read<FirestoreService>();
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final senderId = currentUser?.uid ?? '';
+    final senderName = currentUser?.displayName ?? currentUser?.email?.split('@')[0] ?? 'User';
 
     try {
       await firestore.sendMessage(
@@ -53,6 +56,8 @@ class _ChatScreenState extends State<ChatScreen> {
         text: text,
         chatImageBytes: _selectedImageBytes,
         isGroup: false,
+        senderId: senderId,
+        senderName: senderName,
       );
       _messageController.clear();
       setState(() {
