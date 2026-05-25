@@ -1,9 +1,11 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/chat_message_model.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/chat_bubble.dart';
+import '../utils/image_picker_helper.dart';
 
 class GlobalChatTab extends StatefulWidget {
   const GlobalChatTab({super.key});
@@ -14,10 +16,29 @@ class GlobalChatTab extends StatefulWidget {
 
 class _GlobalChatTabState extends State<GlobalChatTab> {
   final _messageController = TextEditingController();
+  Uint8List? _selectedImageBytes;
+  bool _isSending = false;
+
+  void _pickImage() async {
+    final bytes = await ImagePickerHelper.pickImage();
+    if (bytes != null) {
+      setState(() {
+        _selectedImageBytes = bytes;
+      });
+    }
+  }
+
+  void _removeSelectedImage() {
+    setState(() {
+      _selectedImageBytes = null;
+    });
+  }
 
   void _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _selectedImageBytes == null) return;
+
+    setState(() => _isSending = true);
 
     final auth = context.read<AuthService>();
     final firestore = context.read<FirestoreService>();
@@ -25,8 +46,19 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
 
     if (user != null) {
       final username = user.email?.split('@')[0] ?? 'User';
-      await firestore.sendGlobalMessage(user.uid, username, text);
-      _messageController.clear();
+      try {
+        await firestore.sendGlobalMessage(user.uid, username, text, _selectedImageBytes);
+        _messageController.clear();
+        setState(() {
+          _selectedImageBytes = null;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error sending message: $e')),
+        );
+      } finally {
+        setState(() => _isSending = false);
+      }
     }
   }
 
@@ -58,6 +90,7 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                     senderName: msg.senderName,
                     timestamp: msg.timestamp,
                     isMe: msg.senderId == currentUserId,
+                    imageUrl: msg.imageUrl,
                   );
                 },
               );
@@ -68,28 +101,77 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
           color: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SafeArea(
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0F2F5),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: const InputDecoration(
-                        hintText: "Type a message...",
-                        border: InputBorder.none,
-                      ),
+                if (_selectedImageBytes != null) ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.memory(
+                              _selectedImageBytes!,
+                              height: 80,
+                              width: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const CircleAvatar(
+                            backgroundColor: Colors.black54,
+                            radius: 10,
+                            child: Icon(Icons.close, color: Colors.white, size: 12),
+                          ),
+                          onPressed: _removeSelectedImage,
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Color(0xFF1877F2)),
-                  onPressed: _sendMessage,
+                ],
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.photo, color: Color(0xFF1877F2)),
+                      onPressed: _pickImage,
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0F2F5),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TextField(
+                          controller: _messageController,
+                          decoration: const InputDecoration(
+                            hintText: "Type a message...",
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _isSending
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.send, color: Color(0xFF1877F2)),
+                            onPressed: _sendMessage,
+                          ),
+                  ],
                 ),
               ],
             ),

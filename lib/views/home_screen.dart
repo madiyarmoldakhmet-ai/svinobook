@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import 'feed_tab.dart';
 import 'global_chat_tab.dart';
 import 'direct_messages_tab.dart';
+import 'profile_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const FeedTab(),
     const GlobalChatTab(),
     const DirectMessagesTab(),
+    const ProfileTab(),
   ];
 
   @override
@@ -61,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey.shade600,
         backgroundColor: Colors.white,
         elevation: 8,
+        type: BottomNavigationBarType.fixed, // Needed for 4+ items
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.feed),
@@ -73,6 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
             label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),

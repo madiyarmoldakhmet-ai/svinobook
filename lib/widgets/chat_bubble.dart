@@ -6,6 +6,7 @@ class ChatBubble extends StatelessWidget {
   final String senderName;
   final DateTime timestamp;
   final bool isMe;
+  final String? imageUrl;
 
   const ChatBubble({
     super.key,
@@ -13,6 +14,7 @@ class ChatBubble extends StatelessWidget {
     required this.senderName,
     required this.timestamp,
     required this.isMe,
+    this.imageUrl,
   });
 
   @override
@@ -43,13 +45,45 @@ class ChatBubble extends StatelessWidget {
                 ),
               ),
             if (!isMe) const SizedBox(height: 4),
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 15,
-                color: isMe ? Colors.white : Colors.black87,
+            if (imageUrl != null && imageUrl!.isNotEmpty) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageUrl!,
+                  height: 200,
+                  width: 200,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 150,
+                      width: 200,
+                      color: Colors.black12,
+                      child: const Center(
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 150,
+                      width: 200,
+                      color: Colors.black12,
+                      child: const Center(child: Icon(Icons.broken_image, color: Colors.white70)),
+                    );
+                  },
+                ),
               ),
-            ),
+              if (text.isNotEmpty) const SizedBox(height: 6),
+            ],
+            if (text.isNotEmpty)
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isMe ? Colors.white : Colors.black87,
+                ),
+              ),
             const SizedBox(height: 4),
             Text(
               DateFormat.jm().format(timestamp),

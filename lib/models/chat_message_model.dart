@@ -5,14 +5,20 @@ class ChatMessageModel {
   final String senderId;
   final String senderName;
   final String text;
+  final String? imageUrl;
   final DateTime timestamp;
+  final bool isGroup;
+  final String chatRoomId;
 
   ChatMessageModel({
     required this.id,
     required this.senderId,
     required this.senderName,
     required this.text,
+    this.imageUrl,
     required this.timestamp,
+    required this.isGroup,
+    required this.chatRoomId,
   });
 
   factory ChatMessageModel.fromMap(Map<String, dynamic> data, String documentId) {
@@ -21,7 +27,10 @@ class ChatMessageModel {
       senderId: data['senderId'] ?? '',
       senderName: data['senderName'] ?? 'Unknown',
       text: data['text'] ?? '',
+      imageUrl: data['imageUrl'],
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isGroup: data['isGroup'] ?? false,
+      chatRoomId: data['chatRoomId'] ?? '',
     );
   }
 
@@ -30,7 +39,10 @@ class ChatMessageModel {
       'senderId': senderId,
       'senderName': senderName,
       'text': text,
+      'imageUrl': imageUrl,
       'timestamp': Timestamp.fromDate(timestamp),
+      'isGroup': isGroup,
+      'chatRoomId': chatRoomId,
     };
   }
 }

@@ -22,12 +22,13 @@ class AuthService {
 
       if (credential.user != null) {
         UserModel newUser = UserModel(
-          uid: credential.user!.uid,
-          username: username,
-          createdAt: DateTime.now(),
+          id: credential.user!.uid,
+          name: username,
+          email: email,
+          photoUrl: null,
         );
 
-        await _firestore.collection('users').doc(newUser.uid).set(newUser.toMap());
+        await _firestore.collection('users').doc(newUser.id).set(newUser.toMap());
       }
       return credential;
     } catch (e) {

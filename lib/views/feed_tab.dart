@@ -1,9 +1,10 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/post_model.dart';
 import '../services/firestore_service.dart';
-import '../services/auth_service.dart';
 import '../widgets/post_card.dart';
+import '../utils/image_picker_helper.dart';
 
 class FeedTab extends StatefulWidget {
   const FeedTab({super.key});
@@ -14,20 +15,47 @@ class FeedTab extends StatefulWidget {
 
 class _FeedTabState extends State<FeedTab> {
   final _postController = TextEditingController();
+  Uint8List? _selectedImageBytes;
+  bool _isPosting = false;
+
+  void _pickImage() async {
+    final bytes = await ImagePickerHelper.pickImage();
+    if (bytes != null) {
+      setState(() {
+        _selectedImageBytes = bytes;
+      });
+    }
+  }
+
+  void _removeSelectedImage() {
+    setState(() {
+      _selectedImageBytes = null;
+    });
+  }
 
   void _createPost() async {
     final text = _postController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _selectedImageBytes == null) return;
 
-    final auth = context.read<AuthService>();
+    setState(() => _isPosting = true);
+
     final firestore = context.read<FirestoreService>();
-    final user = auth.currentUser;
 
-    if (user != null) {
-      // Typically we'd fetch the user profile for the name, but for simplicity using email or placeholder
-      final username = user.email?.split('@')[0] ?? 'User';
-      await firestore.createPost(user.uid, username, text);
+    try {
+      await firestore.createPost(
+        text: text,
+        postImageBytes: _selectedImageBytes,
+      );
       _postController.clear();
+      setState(() {
+        _selectedImageBytes = null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error creating post: $e')),
+      );
+    } finally {
+      setState(() => _isPosting = false);
     }
   }
 
@@ -39,27 +67,88 @@ class _FeedTabState extends State<FeedTab> {
         Container(
           color: Colors.white,
           padding: const EdgeInsets.all(16),
-          child: Row(
+          child: Column(
             children: [
-              const CircleAvatar(
-                backgroundColor: Color(0xFF1877F2),
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _postController,
-                  decoration: InputDecoration(
-                    hintText: "What's on your mind?",
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.grey.shade600),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Color(0xFF1877F2),
+                    child: Icon(Icons.person, color: Colors.white),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _postController,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintText: "What's on your mind?",
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.send, color: Color(0xFF1877F2)),
-                onPressed: _createPost,
-              )
+              if (_selectedImageBytes != null) ...[
+                const SizedBox(height: 12),
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.memory(
+                        _selectedImageBytes!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const CircleAvatar(
+                        backgroundColor: Colors.black54,
+                        radius: 14,
+                        child: Icon(Icons.close, color: Colors.white, size: 16),
+                      ),
+                      onPressed: _removeSelectedImage,
+                    ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 8),
+              const Divider(height: 1),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.photo_library, color: Color(0xFF45BD62)),
+                    label: const Text(
+                      'Photo',
+                      style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  _isPosting
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1877F2),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: _createPost,
+                          child: const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                ],
+              ),
             ],
           ),
         ),

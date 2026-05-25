@@ -26,10 +26,15 @@ class PostCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 backgroundColor: const Color(0xFF1877F2),
-                child: Text(
-                  post.authorName.isNotEmpty ? post.authorName[0].toUpperCase() : '?',
-                  style: const TextStyle(color: Colors.white),
-                ),
+                backgroundImage: post.userPhotoUrl != null && post.userPhotoUrl!.isNotEmpty
+                    ? NetworkImage(post.userPhotoUrl!)
+                    : null,
+                child: post.userPhotoUrl == null || post.userPhotoUrl!.isEmpty
+                    ? Text(
+                        post.authorName.isNotEmpty ? post.authorName[0].toUpperCase() : '?',
+                        style: const TextStyle(color: Colors.white),
+                      )
+                    : null,
               ),
               const SizedBox(width: 10),
               Column(
@@ -52,6 +57,32 @@ class PostCard extends StatelessWidget {
             post.content,
             style: const TextStyle(fontSize: 15),
           ),
+          if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                post.imageUrl!,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 200,
+                    color: Colors.grey.shade100,
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 200,
+                    color: Colors.grey.shade100,
+                    child: const Center(child: Icon(Icons.broken_image, size: 40)),
+                  );
+                },
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           Divider(color: Colors.grey.shade300, height: 1),
           const SizedBox(height: 8),
