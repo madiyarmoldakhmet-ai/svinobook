@@ -48,39 +48,65 @@ class DirectMessagesTab extends StatelessWidget {
             }
             return ListView.builder(
               itemCount: users.length,
-              itemBuilder: (context, index) {
-                final data = users[index].data() as Map<String, dynamic>;
-                final uid = users[index].id;
-                final name = data['name'] ?? data['username'] ?? 'User';
-                final photoUrl = data['photoUrl'] as String?;
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF8B0000), width: 0.5),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: const Color(0xFF8B0000),
-                      backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                      child: photoUrl == null
-                          ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?',
-                              style: const TextStyle(color: Colors.white))
-                          : null,
-                    ),
-                    title: Text(name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                    subtitle: Text(uid, style: const TextStyle(color: Colors.white60)),
-                    onTap: () {
-                      final chatId = firestore.getChatRoomId(currentUserId, uid);
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => ChatScreen(chatId: chatId, chatName: name),
-                      ));
+                itemBuilder: (context, index) {
+                  final data = users[index].data() as Map<String, dynamic>;
+                  final uid = users[index].id;
+                  final name = data['name'] ?? data['username'] ?? 'User';
+                  final photoUrl = data['photoUrl'] as String?;
+                  final chatId = firestore.getChatRoomId(currentUserId, uid);
+                  return StreamBuilder<DocumentSnapshot>(
+                    stream: FirebaseFirestore.instance.collection('chats').doc(chatId).snapshots(),
+                    builder: (context, chatSnap) {
+                      int unread = 0;
+                      if (chatSnap.hasData && chatSnap.data != null) {
+                        final dataMap = chatSnap.data!.data() as Map<String, dynamic>?;
+                        if (dataMap != null && dataMap['unreadCounts'] != null) {
+                          final counts = dataMap['unreadCounts'] as Map<String, dynamic>;
+                          unread = (counts[currentUserId] ?? 0) as int;
+                        }
+                      }
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF8B0000), width: 0.5),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFF8B0000),
+                            backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+                            child: photoUrl == null
+                                ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                    style: const TextStyle(color: Colors.white))
+                                : null,
+                          ),
+                          title: Text(name,
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                          subtitle: Text(uid, style: const TextStyle(color: Colors.white60)),
+                          trailing: unread > 0
+                              ? Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '$unread',
+                                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                                  ),
+                                )
+                              : null,
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => ChatScreen(chatId: chatId, chatName: name),
+                            ));
+                          },
+                        ),
+                      );
                     },
-                  ),
-                );
-              },
+                  );
+                },
             );
           },
         ),

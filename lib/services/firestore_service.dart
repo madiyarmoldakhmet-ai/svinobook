@@ -174,6 +174,14 @@ class FirestoreService {
     required String senderId,
     required String senderName,
   }) async {
+    // Determine the other participant's ID for direct chats
+    String? otherUserId;
+    if (!isGroup) {
+      final parts = chatRoomId.split('_');
+      if (parts.length == 2) {
+        otherUserId = parts[0] == senderId ? parts[1] : parts[0];
+      }
+    }
     String? imageUrl;
     if (chatImageBytes != null) {
       final fileName = '${senderId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -195,6 +203,10 @@ class FirestoreService {
       'timestamp': FieldValue.serverTimestamp(),
       'isRead': false,
     });
+    // Increment unread count for recipient in direct chats
+    if (!isGroup && otherUserId != null) {
+      batch.update(chatRef, {"unreadCounts.$otherUserId": FieldValue.increment(1)});
+    }
     // Update last message metadata
     batch.set(chatRef, {
       'lastMessage': text,

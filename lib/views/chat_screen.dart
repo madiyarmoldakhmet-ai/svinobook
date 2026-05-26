@@ -20,7 +20,18 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final firestore = Provider.of<FirestoreService>(context, listen: false);
+      final currentUserId = Provider.of<AuthService>(context, listen: false).currentUser?.uid ?? '';
+      if (currentUserId.isNotEmpty) {
+        firestore.resetUnreadCount(widget.chatId, currentUserId);
+      }
+    });
+  }
+
   final _messageController = TextEditingController();
   Uint8List? _selectedImageBytes;
   bool _isSending = false;

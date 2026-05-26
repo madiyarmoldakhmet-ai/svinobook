@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
-
+import '../widgets/anime_background.dart';
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
@@ -47,63 +47,65 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'svinobook',
-                style: TextStyle(
-                  color: Color(0xFF1877F2),
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -1,
+      backgroundColor: Colors.transparent,
+      body: AnimeBackground(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'svinobook',
+                  style: TextStyle(
+                    color: Color(0xFF1877F2),
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -1,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Connect with friends and the world around you.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, color: Colors.black87),
-              ),
-              const SizedBox(height: 32),
-              if (!_isLogin) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'Connect with friends and the world around you.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+                const SizedBox(height: 32),
+                if (!_isLogin) ...[
+                  CustomTextField(
+                    controller: _usernameController,
+                    hintText: 'Username',
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 CustomTextField(
-                  controller: _usernameController,
-                  hintText: 'Username',
+                  controller: _emailController,
+                  hintText: 'Email address',
+                  keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 12),
-              ],
-              CustomTextField(
-                controller: _emailController,
-                hintText: 'Email address',
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                controller: _passwordController,
-                hintText: 'Password',
-                obscureText: true,
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : PrimaryButton(
-                      text: _isLogin ? 'Log In' : 'Sign Up',
-                      onPressed: _submit,
-                    ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => setState(() => _isLogin = !_isLogin),
-                child: Text(
-                  _isLogin ? 'Create New Account' : 'Already have an account? Log In',
-                  style: const TextStyle(color: Color(0xFF1877F2), fontWeight: FontWeight.bold),
+                CustomTextField(
+                  controller: _passwordController,
+                  hintText: 'Password',
+                  obscureText: true,
                 ),
-              )
-            ],
+                const SizedBox(height: 24),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : PrimaryButton(
+                        text: _isLogin ? 'Log In' : 'Sign Up',
+                        onPressed: _submit,
+                      ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => setState(() => _isLogin = !_isLogin),
+                  child: Text(
+                    _isLogin ? 'Create New Account' : 'Already have an account? Log In',
+                    style: const TextStyle(color: Color(0xFF1877F2), fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

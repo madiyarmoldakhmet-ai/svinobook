@@ -94,19 +94,11 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.85),
-        title: const Text(
-          'GLOBAL NEXUS CHAT',
-          style: TextStyle(
-            color: Color(0xFF8B0000),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            letterSpacing: 1.2,
-          ),
-        ),
+        title: const SizedBox.shrink(),
         actions: [
           IconButton(
             tooltip: 'Search Users',
-            icon: const Icon(Icons.search, color: Color(0xFF8B0000)),
+            icon: const Icon(Icons.search, color: Colors.white),
             onPressed: _showUserSearch,
           ),
         ],

@@ -7,6 +7,7 @@ class ChatMessageModel {
   final String text;
   final String? imageUrl;
   final DateTime timestamp;
+  final bool isRead;
   final bool isGroup;
   final String chatRoomId;
 
@@ -17,6 +18,7 @@ class ChatMessageModel {
     required this.text,
     this.imageUrl,
     required this.timestamp,
+    this.isRead = false,
     required this.isGroup,
     required this.chatRoomId,
   });
@@ -29,6 +31,7 @@ class ChatMessageModel {
       text: data['text'] ?? '',
       imageUrl: data['imageUrl'],
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isRead: data['isRead'] ?? false,
       isGroup: data['isGroup'] ?? false,
       chatRoomId: data['chatRoomId'] ?? '',
     );
@@ -41,6 +44,7 @@ class ChatMessageModel {
       'text': text,
       'imageUrl': imageUrl,
       'timestamp': Timestamp.fromDate(timestamp),
+      'isRead': isRead,
       'isGroup': isGroup,
       'chatRoomId': chatRoomId,
     };
