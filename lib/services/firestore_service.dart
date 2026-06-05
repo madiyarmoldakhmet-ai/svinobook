@@ -11,7 +11,12 @@ class FirestoreService {
   final StorageService _storage = StorageService();
 
   // --- Profile / Users ---
-  Future<void> updateProfile({required String name, Uint8List? avatarBytes}) async {
+  Future<void> updateProfile({
+    required String name,
+    Uint8List? avatarBytes,
+    String? chatBackgroundUrl,
+    String? status,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('No authenticated user');
 
@@ -30,6 +35,12 @@ class FirestoreService {
     };
     if (photoUrl != null) {
       updateData['photoUrl'] = photoUrl;
+    }
+    if (chatBackgroundUrl != null) {
+      updateData['chatBackgroundUrl'] = chatBackgroundUrl;
+    }
+    if (status != null) {
+      updateData['status'] = status;
     }
 
     await _db.collection('users').doc(user.uid).update(updateData);
@@ -130,6 +141,7 @@ class FirestoreService {
       'text': text,
       'imageUrl': imageUrl,
       'timestamp': FieldValue.serverTimestamp(),
+      'type': imageUrl != null ? 'image' : 'text',
     });
   }
 
@@ -184,11 +196,11 @@ class FirestoreService {
     }
     String? imageUrl;
     if (chatImageBytes != null) {
-      final fileName = '${senderId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final timestampStr = DateTime.now().millisecondsSinceEpoch.toString();
       imageUrl = await _storage.uploadImage(
         fileBytes: chatImageBytes,
-        folder: isGroup ? 'group_chats' : 'direct_chats',
-        fileName: fileName,
+        folder: 'chat_images/$chatRoomId/$timestampStr',
+        fileName: 'image.jpg',
       );
     }
 
@@ -202,6 +214,7 @@ class FirestoreService {
       'imageUrl': imageUrl,
       'timestamp': FieldValue.serverTimestamp(),
       'isRead': false,
+      'type': imageUrl != null ? 'image' : 'text',
     });
     // Increment unread count for recipient in direct chats
     if (!isGroup && otherUserId != null) {

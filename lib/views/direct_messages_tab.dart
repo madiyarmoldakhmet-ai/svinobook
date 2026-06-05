@@ -83,7 +83,11 @@ class DirectMessagesTab extends StatelessWidget {
                           ),
                           title: Text(name,
                               style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                          subtitle: Text(uid, style: const TextStyle(color: Colors.white60)),
+                          subtitle: Text(
+                              (data['status'] as String?)?.isNotEmpty == true
+                                  ? (data['status'] as String)
+                                  : uid,
+                              style: const TextStyle(color: Colors.white60)),
                           trailing: unread > 0
                               ? Container(
                                   padding: const EdgeInsets.all(6),

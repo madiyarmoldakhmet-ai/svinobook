@@ -7,6 +7,7 @@ class ChatBubble extends StatelessWidget {
   final DateTime timestamp;
   final bool isMe;
   final String? imageUrl;
+  final String type;
 
   const ChatBubble({
     super.key,
@@ -15,10 +16,45 @@ class ChatBubble extends StatelessWidget {
     required this.timestamp,
     required this.isMe,
     this.imageUrl,
+    this.type = 'text',
   });
+
+  Widget _buildTextOrCode(BuildContext context) {
+    final trimmed = text.trim();
+    if (trimmed.startsWith('```') && trimmed.endsWith('```')) {
+      final codeContent = trimmed.substring(3, trimmed.length - 3).trim();
+      return Container(
+        margin: const EdgeInsets.only(top: 4, bottom: 4),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white24, width: 0.5),
+        ),
+        child: Text(
+          codeContent,
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 13,
+            color: Color(0xFF50FA7B), // Dracula Green
+          ),
+        ),
+      );
+    }
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 15,
+        color: isMe ? Colors.white : Colors.black87,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final showImage = type == 'image' || (imageUrl != null && imageUrl!.isNotEmpty);
+    final displayUrl = imageUrl ?? (type == 'image' ? text : null);
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -45,11 +81,11 @@ class ChatBubble extends StatelessWidget {
                 ),
               ),
             if (!isMe) const SizedBox(height: 4),
-            if (imageUrl != null && imageUrl!.isNotEmpty) ...[
+            if (showImage && displayUrl != null && displayUrl.isNotEmpty) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  imageUrl!,
+                  displayUrl,
                   height: 200,
                   width: 200,
                   fit: BoxFit.cover,
@@ -74,16 +110,10 @@ class ChatBubble extends StatelessWidget {
                   },
                 ),
               ),
-              if (text.isNotEmpty) const SizedBox(height: 6),
+              if (text.isNotEmpty && type != 'image') const SizedBox(height: 6),
             ],
-            if (text.isNotEmpty)
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: isMe ? Colors.white : Colors.black87,
-                ),
-              ),
+            if (text.isNotEmpty && type != 'image')
+              _buildTextOrCode(context),
             const SizedBox(height: 4),
             Text(
               DateFormat.jm().format(timestamp),

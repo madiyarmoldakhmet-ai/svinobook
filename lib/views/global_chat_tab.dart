@@ -144,6 +144,7 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         timestamp: msg.timestamp,
                         isMe: msg.senderId == currentUserId,
                         imageUrl: msg.imageUrl,
+                        type: msg.type,
                       );
                     },
                   );

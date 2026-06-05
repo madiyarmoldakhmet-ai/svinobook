@@ -10,6 +10,7 @@ class ChatMessageModel {
   final bool isRead;
   final bool isGroup;
   final String chatRoomId;
+  final String type;
 
   ChatMessageModel({
     required this.id,
@@ -21,19 +22,22 @@ class ChatMessageModel {
     this.isRead = false,
     required this.isGroup,
     required this.chatRoomId,
+    required this.type,
   });
 
   factory ChatMessageModel.fromMap(Map<String, dynamic> data, String documentId) {
+    final img = data['imageUrl'] as String?;
     return ChatMessageModel(
       id: documentId,
       senderId: data['senderId'] ?? '',
       senderName: data['senderName'] ?? 'Unknown',
       text: data['text'] ?? '',
-      imageUrl: data['imageUrl'],
+      imageUrl: img,
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isRead: data['isRead'] ?? false,
       isGroup: data['isGroup'] ?? false,
       chatRoomId: data['chatRoomId'] ?? '',
+      type: data['type'] ?? (img != null && img.isNotEmpty ? 'image' : 'text'),
     );
   }
 
@@ -47,6 +51,7 @@ class ChatMessageModel {
       'isRead': isRead,
       'isGroup': isGroup,
       'chatRoomId': chatRoomId,
+      'type': type,
     };
   }
 }

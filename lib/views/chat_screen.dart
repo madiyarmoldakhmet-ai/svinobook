@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/chat_message_model.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
@@ -25,9 +26,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Uint8List? _selectedImageBytes;
   bool _isSending = false;
 
+  bool _isTypingStatus = false;
+
   @override
   void initState() {
     super.initState();
+    _messageController.addListener(_onTextChanged);
     // Reset unread counter after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final firestore = Provider.of<FirestoreService>(context, listen: false);
@@ -41,8 +45,34 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    _messageController.removeListener(_onTextChanged);
     _messageController.dispose();
+    _setTypingStatus(false);
     super.dispose();
+  }
+
+  void _onTextChanged() {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (currentUserId.isEmpty) return;
+
+    final isTextEmpty = _messageController.text.trim().isEmpty;
+    if (isTextEmpty && _isTypingStatus) {
+      _setTypingStatus(false);
+    } else if (!isTextEmpty && !_isTypingStatus) {
+      _setTypingStatus(true);
+    }
+  }
+
+  void _setTypingStatus(bool typing) async {
+    _isTypingStatus = typing;
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (currentUserId.isNotEmpty) {
+      FirebaseFirestore.instance.collection('chats').doc(widget.chatId).set({
+        'typing': {
+          currentUserId: typing,
+        }
+      }, SetOptions(merge: true));
+    }
   }
 
   Future<void> _pickImage() async {
@@ -158,6 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         timestamp: msg.timestamp,
                         isMe: msg.senderId == currentUserId,
                         imageUrl: msg.imageUrl,
+                        type: msg.type,
                       );
                     },
                   );
@@ -171,6 +202,38 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance.collection('chats').doc(widget.chatId).snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null && snapshot.data!.exists) {
+                          final data = snapshot.data!.data() as Map<String, dynamic>?;
+                          if (data != null && data['typing'] != null) {
+                            final typingMap = data['typing'] as Map<String, dynamic>;
+                            final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+                            final otherTyping = typingMap.entries
+                                .where((e) => e.key != currentUserId && e.value == true)
+                                .isNotEmpty;
+                            if (otherTyping) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0, left: 8.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    '${widget.chatName} is typing...',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                     if (_selectedImageBytes != null) ...[
                       Align(
                         alignment: Alignment.centerLeft,

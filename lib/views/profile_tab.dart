@@ -16,12 +16,16 @@ class ProfileTab extends StatefulWidget {
 
 class _ProfileTabState extends State<ProfileTab> {
   final _nameController = TextEditingController();
+  final _backgroundController = TextEditingController();
+  final _statusController = TextEditingController();
   Uint8List? _selectedAvatarBytes;
   bool _isSaving = false;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _backgroundController.dispose();
+    _statusController.dispose();
     super.dispose();
   }
 
@@ -36,6 +40,9 @@ class _ProfileTabState extends State<ProfileTab> {
 
   void _saveProfile() async {
     final name = _nameController.text.trim();
+    final background = _backgroundController.text.trim();
+    final status = _statusController.text.trim();
+
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Name cannot be empty')),
@@ -50,6 +57,8 @@ class _ProfileTabState extends State<ProfileTab> {
       await firestore.updateProfile(
         name: name,
         avatarBytes: _selectedAvatarBytes,
+        chatBackgroundUrl: background,
+        status: status,
       );
       
       setState(() {
@@ -113,9 +122,17 @@ class _ProfileTabState extends State<ProfileTab> {
             final data = snapshot.data!.data() as Map<String, dynamic>;
             final currentName = data['name'] ?? data['username'] ?? 'User';
             final photoUrl = data['photoUrl'] as String?;
+            final currentBackground = data['chatBackgroundUrl'] as String? ?? '';
+            final currentStatus = data['status'] as String? ?? '';
 
             if (_nameController.text.isEmpty) {
               _nameController.text = currentName;
+            }
+            if (_backgroundController.text.isEmpty) {
+              _backgroundController.text = currentBackground;
+            }
+            if (_statusController.text.isEmpty) {
+              _statusController.text = currentStatus;
             }
 
             return SingleChildScrollView(
@@ -174,6 +191,60 @@ class _ProfileTabState extends State<ProfileTab> {
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Enter your name',
+                            hintStyle: const TextStyle(color: Colors.white38),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.white30),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Custom Status Message',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _statusController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'e.g., Coding, Busy...',
+                            hintStyle: const TextStyle(color: Colors.white38),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.white30),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Custom Wallpaper URL',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _backgroundController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'https://example.com/image.jpg',
                             hintStyle: const TextStyle(color: Colors.white38),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             enabledBorder: OutlineInputBorder(
