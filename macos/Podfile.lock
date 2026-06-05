@@ -1188,6 +1188,12 @@ PODS:
     - abseil/meta/type_traits
     - abseil/xcprivacy
   - abseil/xcprivacy (1.20240722.0)
+  - agora_rtc_engine (0.0.1):
+    - AgoraIrisRTC_macOS2 (= 4.6.2-build.1)
+    - AgoraVideo_Special_macOS (= 4.6.2.70)
+    - FlutterMacOS
+  - AgoraIrisRTC_macOS2 (4.6.2-build.1)
+  - AgoraVideo_Special_macOS (4.6.2.70)
   - BoringSSL-GRPC (0.0.37):
     - BoringSSL-GRPC/Implementation (= 0.0.37)
     - BoringSSL-GRPC/Interface (= 0.0.37)
@@ -1199,6 +1205,8 @@ PODS:
     - Firebase/Firestore (~> 12.13.0)
     - firebase_core
     - FlutterMacOS
+  - file_selector_macos (0.0.1):
+    - FlutterMacOS
   - Firebase/Auth (12.13.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 12.13.0)
@@ -1207,6 +1215,9 @@ PODS:
   - Firebase/Firestore (12.13.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 12.13.0)
+  - Firebase/Storage (12.13.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 12.13.0)
   - firebase_auth (6.5.1):
     - Firebase/Auth (~> 12.13.0)
     - Firebase/CoreOnly (~> 12.13.0)
@@ -1214,6 +1225,11 @@ PODS:
     - FlutterMacOS
   - firebase_core (4.9.0):
     - Firebase/CoreOnly (~> 12.13.0)
+    - FlutterMacOS
+  - firebase_storage (13.4.1):
+    - Firebase/CoreOnly (~> 12.13.0)
+    - Firebase/Storage (~> 12.13.0)
+    - firebase_core
     - FlutterMacOS
   - FirebaseAppCheckInterop (12.13.0)
   - FirebaseAuth (12.13.0):
@@ -1255,6 +1271,13 @@ PODS:
     - leveldb-library (~> 1.22)
     - nanopb (~> 3.30910.0)
   - FirebaseSharedSwift (12.13.0)
+  - FirebaseStorage (12.13.0):
+    - FirebaseAppCheckInterop (~> 12.13.0)
+    - FirebaseAuthInterop (~> 12.13.0)
+    - FirebaseCore (~> 12.13.0)
+    - FirebaseCoreExtension (~> 12.13.0)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GTMSessionFetcher/Core (< 6.0, >= 3.4)
   - FlutterMacOS (1.0.0)
   - GoogleUtilities/AppDelegateSwizzler (8.1.0):
     - GoogleUtilities/Environment
@@ -1370,6 +1393,8 @@ PODS:
   - gRPC-Core/Interface (1.69.0)
   - gRPC-Core/Privacy (1.69.0)
   - GTMSessionFetcher/Core (5.3.0)
+  - iris_method_channel (0.0.1):
+    - FlutterMacOS
   - leveldb-library (1.22.6)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
@@ -1378,14 +1403,20 @@ PODS:
   - nanopb/encode (3.30910.0)
 
 DEPENDENCIES:
+  - agora_rtc_engine (from `Flutter/ephemeral/.symlinks/plugins/agora_rtc_engine/macos`)
   - cloud_firestore (from `Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos`)
+  - file_selector_macos (from `Flutter/ephemeral/.symlinks/plugins/file_selector_macos/macos`)
   - firebase_auth (from `Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos`)
   - firebase_core (from `Flutter/ephemeral/.symlinks/plugins/firebase_core/macos`)
+  - firebase_storage (from `Flutter/ephemeral/.symlinks/plugins/firebase_storage/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - iris_method_channel (from `Flutter/ephemeral/.symlinks/plugins/iris_method_channel/macos`)
 
 SPEC REPOS:
   trunk:
     - abseil
+    - AgoraIrisRTC_macOS2
+    - AgoraVideo_Special_macOS
     - BoringSSL-GRPC
     - Firebase
     - FirebaseAppCheckInterop
@@ -1397,6 +1428,7 @@ SPEC REPOS:
     - FirebaseFirestore
     - FirebaseFirestoreInternal
     - FirebaseSharedSwift
+    - FirebaseStorage
     - GoogleUtilities
     - "gRPC-C++"
     - gRPC-Core
@@ -1405,22 +1437,35 @@ SPEC REPOS:
     - nanopb
 
 EXTERNAL SOURCES:
+  agora_rtc_engine:
+    :path: Flutter/ephemeral/.symlinks/plugins/agora_rtc_engine/macos
   cloud_firestore:
     :path: Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos
+  file_selector_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/file_selector_macos/macos
   firebase_auth:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos
   firebase_core:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_core/macos
+  firebase_storage:
+    :path: Flutter/ephemeral/.symlinks/plugins/firebase_storage/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  iris_method_channel:
+    :path: Flutter/ephemeral/.symlinks/plugins/iris_method_channel/macos
 
 SPEC CHECKSUMS:
   abseil: a05cc83bf02079535e17169a73c5be5ba47f714b
+  agora_rtc_engine: 14e2da307fcc97eab869a13a3118565140c21a66
+  AgoraIrisRTC_macOS2: cf2940680574c3b8b7065e179a22796f40189a32
+  AgoraVideo_Special_macOS: de50782cc9ba41581b2f0a2231f96dd30f7c86e6
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   cloud_firestore: 152eed1556a7d95a12057b07c389d6dbbc3db827
+  file_selector_macos: 9e9e068e90ebee155097d00e89ae91edb2374db7
   Firebase: 7d62445aeabdaea36f7d372f33052fed9a72514f
   firebase_auth: f512858bd4475955843cfe58267119454bf6a74b
   firebase_core: 8a780c7f989df0ca42dcd55332fc1b203f11f848
+  firebase_storage: a2b84e14598032fa18af05f4af5c9890a35ad631
   FirebaseAppCheckInterop: db09d7412340fb4b5a8727d4d410e5a5c780dd56
   FirebaseAuth: fedecd40125af7f898ba4f0a328ac9f3a9c3b8c4
   FirebaseAuthInterop: 63d36ca102054d7336f87aec87b1c68a0bab77e0
@@ -1430,14 +1475,16 @@ SPEC CHECKSUMS:
   FirebaseFirestore: e5c352f6cc5158929702a7dffc0b917324907e89
   FirebaseFirestoreInternal: f5748d57cf73bb51f01ecebce87c72321193e388
   FirebaseSharedSwift: 76bdd9de8ff1da7a601236ee058253e36206978e
+  FirebaseStorage: a4709ed4e33f0b19dc6ac4889bb3c946fe8865ef
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   "gRPC-C++": cc207623316fb041a7a3e774c252cf68a058b9e8
   gRPC-Core: 860978b7db482de8b4f5e10677216309b5ff6330
   GTMSessionFetcher: 127211aeec0b1e904fc49f4f6f895dcc535b0ecf
+  iris_method_channel: 06ef372f01b31866748a3c45da2c89c93b666daa
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
 
-PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
+PODFILE CHECKSUM: 05a8279e19e7597fa1997d7d285a403f7026c918
 
 COCOAPODS: 1.16.2

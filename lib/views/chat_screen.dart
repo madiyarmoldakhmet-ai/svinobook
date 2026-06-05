@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/chat_message_model.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
@@ -14,29 +14,38 @@ class ChatScreen extends StatefulWidget {
   final String chatId;
   final String chatName;
 
-  const ChatScreen({super.key, required this.chatId, required this.chatName});
+  const ChatScreen({Key? key, required this.chatId, required this.chatName}) : super(key: key);
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  Uint8List? _selectedImageBytes;
+  bool _isSending = false;
+
   @override
   void initState() {
     super.initState();
+    // Reset unread counter after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final firestore = Provider.of<FirestoreService>(context, listen: false);
-      final currentUserId = Provider.of<AuthService>(context, listen: false).currentUser?.uid ?? '';
+      final auth = Provider.of<AuthService>(context, listen: false);
+      final currentUserId = auth.currentUser?.uid ?? '';
       if (currentUserId.isNotEmpty) {
         firestore.resetUnreadCount(widget.chatId, currentUserId);
       }
     });
   }
 
-  final _messageController = TextEditingController();
-  Uint8List? _selectedImageBytes;
-  bool _isSending = false;
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
 
-  void _pickImage() async {
+  Future<void> _pickImage() async {
     final bytes = await ImagePickerHelper.pickImage();
     if (bytes != null) {
       setState(() {
@@ -51,16 +60,17 @@ class ChatScreen extends StatefulWidget {
     });
   }
 
-  void _sendMessage() async {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty && _selectedImageBytes == null) return;
 
     setState(() => _isSending = true);
-
     final firestore = context.read<FirestoreService>();
     final currentUser = FirebaseAuth.instance.currentUser;
     final senderId = currentUser?.uid ?? '';
-    final senderName = currentUser?.displayName ?? currentUser?.email?.split('@')[0] ?? 'User';
+    final senderName = currentUser?.displayName ??
+        currentUser?.email?.split('@')[0] ??
+        'User';
 
     try {
       await firestore.sendMessage(
@@ -72,9 +82,7 @@ class ChatScreen extends StatefulWidget {
         senderName: senderName,
       );
       _messageController.clear();
-      setState(() {
-        _selectedImageBytes = null;
-      });
+      _removeSelectedImage();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,27 +90,23 @@ class ChatScreen extends StatefulWidget {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isSending = false);
-      }
+      if (mounted) setState(() => _isSending = false);
     }
   }
 
   void _startCall() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CallScreen(
-          channelId: widget.chatId,
-          chatName: widget.chatName,
-        ),
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => CallScreen(
+        channelId: widget.chatId,
+        chatName: widget.chatName,
       ),
-    );
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUserId = context.read<AuthService>().currentUser?.uid ?? '';
-
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUserId = currentUser?.uid ?? '';
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -128,27 +132,21 @@ class ChatScreen extends StatefulWidget {
                 stream: context.read<FirestoreService>().getDirectMessagesStream(widget.chatId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Color(0xFF8B0000)));
+                    return const Center(
+                        child: CircularProgressIndicator(color: Color(0xFF8B0000)));
                   }
                   if (snapshot.hasError) {
                     return Center(
-                      child: Text(
-                        'Error loading chat: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                    );
+                        child: Text('Error loading chat: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.white70)));
                   }
                   final messages = snapshot.data ?? [];
-                  
                   if (messages.isEmpty) {
                     return const Center(
-                      child: Text(
-                        "No chats yet",
-                        style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic),
-                      ),
+                      child: Text('No chats yet',
+                          style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic)),
                     );
                   }
-
                   return ListView.builder(
                     reverse: true,
                     itemCount: messages.length,
@@ -237,7 +235,8 @@ class ChatScreen extends StatefulWidget {
                             ? const SizedBox(
                                 height: 24,
                                 width: 24,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF8B0000)),
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Color(0xFF8B0000)),
                               )
                             : IconButton(
                                 icon: const Icon(Icons.send, color: Color(0xFF8B0000)),
