@@ -13,18 +13,7 @@ class AnimeBackground extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF0F0C20),
-            Color(0xFF15102A),
-            Color(0xFF06040A),
-          ],
-          stops: [0.0, 0.5, 1.0],
-        ),
-      ),
+      color: const Color(0xFF1E1E1E),
       child: child,
     );
   }
