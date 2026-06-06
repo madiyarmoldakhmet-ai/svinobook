@@ -219,7 +219,9 @@ class FirestoreService {
     // Increment unread count for recipient in direct chats
     if (!isGroup && otherUserId != null) {
       batch.set(chatRef, {
-        "unreadCounts.$otherUserId": FieldValue.increment(1)
+        'unreadCounts': {
+          otherUserId: FieldValue.increment(1),
+        },
       }, SetOptions(merge: true));
     }
     // Update last message metadata
@@ -236,7 +238,9 @@ class FirestoreService {
   // Reset unread count for a user in a chat
   Future<void> resetUnreadCount(String chatId, String currentUserId) async {
     await _db.collection('chats').doc(chatId).set({
-      'unreadCounts.$currentUserId': 0,
+      'unreadCounts': {
+        currentUserId: 0,
+      },
     }, SetOptions(merge: true));
   }
 
