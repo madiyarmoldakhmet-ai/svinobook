@@ -58,10 +58,10 @@ class DirectMessagesTab extends StatelessWidget {
                     stream: FirebaseFirestore.instance.collection('chats').doc(chatId).snapshots(),
                     builder: (context, chatSnap) {
                       int unread = 0;
-                      if (chatSnap.hasData && chatSnap.data != null) {
+                      if (chatSnap.hasData && chatSnap.data != null && chatSnap.data!.exists) {
                         final dataMap = chatSnap.data!.data() as Map<String, dynamic>?;
-                        if (dataMap != null && dataMap['unreadCounts'] != null) {
-                          final counts = dataMap['unreadCounts'] as Map<String, dynamic>;
+                        final counts = dataMap?['unreadCounts'] as Map?;
+                        if (counts != null) {
                           unread = (counts[currentUserId] ?? 0) as int;
                         }
                       }
