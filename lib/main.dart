@@ -6,6 +6,7 @@ import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
 import 'views/auth_screen.dart';
 import 'views/home_screen.dart';
+import 'utils/app_theme.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -33,17 +34,7 @@ class SvinobookApp extends StatelessWidget {
     return MaterialApp(
       title: 'Svinobook',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0xFF1877F2),
-        scaffoldBackgroundColor: const Color(0xFFF0F2F5),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1877F2)),
-        fontFamily: 'Roboto', // Minimalist clean font
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 1,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       home: const AuthWrapper(),
     );
   }
@@ -61,10 +52,12 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(color: AppColors.neonCyan),
+            ),
           );
         }
-        
+
         final user = snapshot.data;
         if (user != null) {
           return const HomeScreen();

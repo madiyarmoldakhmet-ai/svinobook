@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
 import '../utils/image_picker_helper.dart';
-import '../widgets/anime_background.dart';
+import '../utils/app_theme.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/primary_button.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -60,14 +63,14 @@ class _ProfileTabState extends State<ProfileTab> {
         chatBackgroundUrl: background,
         status: status,
       );
-      
+
       setState(() {
         _selectedAvatarBytes = null;
       });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
+          const SnackBar(content: Text('Profile updated successfully! ✨')),
         );
       }
     } catch (e) {
@@ -83,46 +86,56 @@ class _ProfileTabState extends State<ProfileTab> {
     }
   }
 
+  void _signOut() async {
+    final auth = context.read<AuthService>();
+    await auth.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
+    final topPad = MediaQuery.of(context).padding.top;
+
     if (currentUser == null) {
-      return const Center(child: Text('Not logged in', style: TextStyle(color: Colors.white)));
+      return Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: const Center(
+          child: Text('Not logged in',
+              style: TextStyle(color: AppColors.textSecondary)),
+        ),
+      );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.85),
-        title: const Text(
-          'PROFILE SETTINGS',
-          style: TextStyle(
-            color: Color(0xFF8B0000),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            letterSpacing: 1.2,
-          ),
-        ),
-        elevation: 0,
-      ),
-      body: AnimeBackground(
-        child: StreamBuilder<DocumentSnapshot>(
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection('users')
               .doc(currentUser.uid)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: Color(0xFF8B0000)));
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.neonCyan),
+              );
             }
-            if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-              return const Center(child: Text('Error loading profile data', style: TextStyle(color: Colors.white70)));
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                !snapshot.data!.exists) {
+              return const Center(
+                child: Text('Error loading profile data',
+                    style: TextStyle(color: AppColors.textSecondary)),
+              );
             }
 
             final data = snapshot.data!.data() as Map<String, dynamic>;
-            final currentName = data['name'] ?? data['username'] ?? 'User';
+            final currentName =
+                data['name'] ?? data['username'] ?? 'User';
             final photoUrl = data['photoUrl'] as String?;
-            final currentBackground = data['chatBackgroundUrl'] as String? ?? '';
+            final currentBackground =
+                data['chatBackgroundUrl'] as String? ?? '';
             final currentStatus = data['status'] as String? ?? '';
 
             if (_nameController.text.isEmpty) {
@@ -135,176 +148,225 @@ class _ProfileTabState extends State<ProfileTab> {
               _statusController.text = currentStatus;
             }
 
+            final avatarImage = _selectedAvatarBytes != null
+                ? MemoryImage(_selectedAvatarBytes!)
+                : (photoUrl != null ? NetworkImage(photoUrl) : null)
+                    as ImageProvider?;
+
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.fromLTRB(
+                  20, topPad + 16, 20, 120),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  // ── Header ──
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.neonCyan
+                                  .withValues(alpha: 0.3),
+                              blurRadius: 12,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.person_rounded,
+                            color: AppColors.bgDarkest),
+                      ),
+                      const SizedBox(width: 14),
+                      const Text(
+                        'Profile',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 28,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: _signOut,
+                        tooltip: 'Sign out',
+                        icon: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.danger.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.danger
+                                  .withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(Icons.logout_rounded,
+                              color: AppColors.danger, size: 22),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+
+                  // ── Avatar ──
                   Stack(
                     alignment: Alignment.bottomRight,
                     children: [
-                      CircleAvatar(
-                        radius: 70,
-                        backgroundColor: const Color(0xFF8B0000),
-                        backgroundImage: _selectedAvatarBytes != null
-                            ? MemoryImage(_selectedAvatarBytes!)
-                            : (photoUrl != null ? NetworkImage(photoUrl) : null) as ImageProvider?,
-                        child: (_selectedAvatarBytes == null && photoUrl == null)
-                            ? Text(
-                                currentName.isNotEmpty ? currentName[0].toUpperCase() : '?',
-                                style: const TextStyle(fontSize: 48, color: Colors.white, fontWeight: FontWeight.bold),
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: AppColors.primaryGradient,
+                          image: avatarImage != null
+                              ? DecorationImage(
+                                  image: avatarImage, fit: BoxFit.cover)
+                              : null,
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  AppColors.neonCyan.withValues(alpha: 0.4),
+                              blurRadius: 24,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: avatarImage == null
+                            ? Center(
+                                child: Text(
+                                  currentName.isNotEmpty
+                                      ? currentName[0].toUpperCase()
+                                      : '?',
+                                  style: const TextStyle(
+                                    fontSize: 48,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
                               )
                             : null,
                       ),
                       InkWell(
                         onTap: _pickAvatar,
-                        child: const CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Color(0xFF8B0000),
-                          child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: AppColors.bgDarkest, width: 3),
+                          ),
+                          child: const Icon(Icons.camera_alt_rounded,
+                              color: AppColors.bgDarkest, size: 18),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 32),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF8B0000), width: 0.8),
-                    ),
+
+                  // ── Form card ──
+                  GlassCard(
                     padding: const EdgeInsets.all(20),
+                    borderRadius: 20,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Display Name',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.white70,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        TextField(
+                        CustomTextField(
                           controller: _nameController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'Enter your name',
-                            hintStyle: const TextStyle(color: Colors.white38),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white30),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
-                            ),
-                          ),
+                          hintText: 'Enter your name',
+                          prefixIcon: const Icon(Icons.person_outline,
+                              color: AppColors.neonCyan, size: 20),
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'Custom Status Message',
+                          'Status Message',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.white70,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        TextField(
+                        CustomTextField(
                           controller: _statusController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'e.g., Coding, Busy...',
-                            hintStyle: const TextStyle(color: Colors.white38),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white30),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
-                            ),
-                          ),
+                          hintText: 'e.g., Coding, Busy...',
+                          prefixIcon: const Icon(Icons.chat_bubble_outline,
+                              color: AppColors.neonCyan, size: 20),
                         ),
                         const SizedBox(height: 16),
                         const Text(
                           'Custom Wallpaper URL',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.white70,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        TextField(
+                        CustomTextField(
                           controller: _backgroundController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'https://example.com/image.jpg',
-                            hintStyle: const TextStyle(color: Colors.white38),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white30),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
-                            ),
-                          ),
+                          hintText: 'https://example.com/image.jpg',
+                          keyboardType: TextInputType.url,
+                          prefixIcon: const Icon(Icons.wallpaper,
+                              color: AppColors.neonCyan, size: 20),
                         ),
                         const SizedBox(height: 16),
                         const Text(
                           'Email Address',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.white70,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        TextField(
-                          controller: TextEditingController(text: currentUser.email),
-                          enabled: false,
-                          style: const TextStyle(color: Colors.white70),
-                          decoration: InputDecoration(
-                            fillColor: Colors.white12,
-                            filled: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.transparent),
-                            ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: AppColors.glassBg,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                                color: AppColors.glassBorder, width: 1),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.mail_outline,
+                                  color: AppColors.textMuted, size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  currentUser.email ?? '',
+                                  style: const TextStyle(
+                                      color: AppColors.textMuted),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B0000),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: _isSaving ? null : _saveProfile,
-                      child: _isSaving
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              'Save Changes',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                    ),
+                  const SizedBox(height: 28),
+                  PrimaryButton(
+                    text: 'Save Changes',
+                    onPressed: _saveProfile,
+                    isLoading: _isSaving,
+                    icon: Icons.check_rounded,
                   ),
                 ],
               ),

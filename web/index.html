@@ -1,46 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Svinobook — a modern social & chat experience.">
+  <meta name="theme-color" content="#0B0E14">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="svinobook">
+  <meta name="apple-mobile-web-app-title" content="Svinobook">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>svinobook</title>
+  <!-- Open Graph -->
+  <meta property="og:title" content="Svinobook">
+  <meta property="og:description" content="A modern social & chat experience.">
+  <meta property="og:type" content="website">
+
+  <title>Svinobook</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* ── Loading splash ── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #0B0E14 0%, #1A1F2C 50%, #0B0E14 100%);
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    #splash.fade { opacity: 0; pointer-events: none; }
+    .logo {
+      width: 84px;
+      height: 84px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #00E5FF, #448AFF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: #0B0E14;
+      font-weight: 800;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      box-shadow: 0 0 40px rgba(0, 229, 255, 0.35);
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .title {
+      margin-top: 22px;
+      color: #F5F7FA;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    .subtitle {
+      margin-top: 4px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    .spinner {
+      margin-top: 32px;
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid rgba(0, 229, 255, 0.2);
+      border-top-color: #00E5FF;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="splash">
+    <div class="logo">S</div>
+    <div class="title">Svinobook</div>
+    <div class="subtitle">Connecting the community</div>
+    <div class="spinner"></div>
+  </div>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <script>
+    // Hide splash once Flutter is ready
+    window.addEventListener('flutter-first-frame', function () {
+      var s = document.getElementById('splash');
+      if (s) {
+        s.classList.add('fade');
+        setTimeout(function () { s.remove(); }, 700);
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

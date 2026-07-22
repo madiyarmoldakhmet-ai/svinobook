@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../utils/app_theme.dart';
 
 class ChatBubble extends StatelessWidget {
   final String text;
@@ -25,18 +27,19 @@ class ChatBubble extends StatelessWidget {
       final codeContent = trimmed.substring(3, trimmed.length - 3).trim();
       return Container(
         margin: const EdgeInsets.only(top: 4, bottom: 4),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white24, width: 0.5),
+          border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1), width: 0.5),
         ),
         child: Text(
           codeContent,
           style: const TextStyle(
             fontFamily: 'monospace',
             fontSize: 13,
-            color: Color(0xFF50FA7B), // Dracula Green
+            color: AppColors.neonGreen, // Dracula Green
           ),
         ),
       );
@@ -45,84 +48,147 @@ class ChatBubble extends StatelessWidget {
       text,
       style: TextStyle(
         fontSize: 15,
-        color: isMe ? Colors.white : Colors.black87,
+        color: isMe ? Colors.white : AppColors.textPrimary,
+        height: 1.4,
       ),
     );
   }
+
+  BorderRadius _radiusFor(bool isMe) => BorderRadius.circular(18).copyWith(
+        bottomRight:
+            isMe ? const Radius.circular(4) : const Radius.circular(18),
+        bottomLeft:
+            isMe ? const Radius.circular(18) : const Radius.circular(4),
+      );
 
   @override
   Widget build(BuildContext context) {
     final showImage = type == 'image' || (imageUrl != null && imageUrl!.isNotEmpty);
     final displayUrl = imageUrl ?? (type == 'image' ? text : null);
 
+    final bgColor = isMe
+        ? AppColors.neonCyan.withValues(alpha: 0.15)
+        : AppColors.glassBg;
+    final borderColor = isMe
+        ? AppColors.neonCyan.withValues(alpha: 0.35)
+        : AppColors.glassBorder;
+    final glowColor = isMe ? AppColors.neonBlue.withValues(alpha: 0.25) : Colors.transparent;
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isMe ? const Color(0xFF1877F2) : const Color(0xFFF0F2F5),
-          borderRadius: BorderRadius.circular(16).copyWith(
-            bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(16),
-            bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(0),
-          ),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!isMe)
-              Text(
-                senderName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: _radiusFor(isMe),
+          boxShadow: [
+            if (isMe)
+              BoxShadow(
+                color: glowColor,
+                blurRadius: 16,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
               ),
-            if (!isMe) const SizedBox(height: 4),
-            if (showImage && displayUrl != null && displayUrl.isNotEmpty) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  displayUrl,
-                  height: 200,
-                  width: 200,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: 150,
-                      width: 200,
-                      color: Colors.black12,
-                      child: const Center(
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 150,
-                      width: 200,
-                      color: Colors.black12,
-                      child: const Center(child: Icon(Icons.broken_image, color: Colors.white70)),
-                    );
-                  },
-                ),
-              ),
-              if (text.isNotEmpty && type != 'image') const SizedBox(height: 6),
-            ],
-            if (text.isNotEmpty && type != 'image')
-              _buildTextOrCode(context),
-            const SizedBox(height: 4),
-            Text(
-              DateFormat.jm().format(timestamp),
-              style: TextStyle(
-                fontSize: 10,
-                color: isMe ? Colors.white70 : Colors.black45,
-              ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: _radiusFor(isMe),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: bgColor,
+                border: Border.all(color: borderColor, width: 1),
+                borderRadius: _radiusFor(isMe),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isMe)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        senderName,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                          color: AppColors.neonCyan.withValues(alpha: 0.8),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  if (showImage &&
+                      displayUrl != null &&
+                      displayUrl.isNotEmpty) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        displayUrl,
+                        height: 200,
+                        width: 200,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 150,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.neonCyan,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 150,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.broken_image,
+                                  color: AppColors.textMuted),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (text.isNotEmpty && type != 'image')
+                      const SizedBox(height: 6),
+                  ],
+                  if (text.isNotEmpty && type != 'image')
+                    _buildTextOrCode(context),
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      DateFormat.jm().format(timestamp),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.white.withValues(alpha: 0.45),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/post_model.dart';
+import '../utils/app_theme.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -9,58 +10,68 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+    return GlassCard(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade300, width: 0.5),
-          bottom: BorderSide(color: Colors.grey.shade300, width: 0.5),
+      borderRadius: 18,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.2),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
         ),
-      ),
+      ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CircleAvatar(
-                backgroundColor: const Color(0xFF1877F2),
-                backgroundImage: post.userPhotoUrl != null && post.userPhotoUrl!.isNotEmpty
+              GradientAvatar(
+                name: post.authorName,
+                radius: 22,
+                backgroundImage: (post.userPhotoUrl != null &&
+                        post.userPhotoUrl!.isNotEmpty)
                     ? NetworkImage(post.userPhotoUrl!)
                     : null,
-                child: post.userPhotoUrl == null || post.userPhotoUrl!.isEmpty
-                    ? Text(
-                        post.authorName.isNotEmpty ? post.authorName[0].toUpperCase() : '?',
-                        style: const TextStyle(color: Colors.white),
-                      )
-                    : null,
               ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.authorName,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    DateFormat.yMMMd().add_jm().format(post.createdAt),
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.authorName,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      DateFormat.yMMMd().add_jm().format(post.createdAt),
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             post.content,
-            style: const TextStyle(fontSize: 15),
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 15,
+              height: 1.5,
+            ),
           ),
           if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(14),
               child: Image.network(
                 post.imageUrl!,
                 width: double.infinity,
@@ -69,32 +80,61 @@ class PostCard extends StatelessWidget {
                   if (loadingProgress == null) return child;
                   return Container(
                     height: 200,
-                    color: Colors.grey.shade100,
-                    child: const Center(child: CircularProgressIndicator()),
+                    decoration: BoxDecoration(
+                      color: AppColors.glassBg,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.neonCyan,
+                        strokeWidth: 2,
+                      ),
+                    ),
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     height: 200,
-                    color: Colors.grey.shade100,
-                    child: const Center(child: Icon(Icons.broken_image, size: 40)),
+                    decoration: BoxDecoration(
+                      color: AppColors.glassBg,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.broken_image,
+                          size: 40, color: AppColors.textMuted),
+                    ),
                   );
                 },
               ),
             ),
           ],
-          const SizedBox(height: 12),
-          Divider(color: Colors.grey.shade300, height: 1),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.thumb_up_alt_outlined, color: Colors.grey.shade600, size: 20),
-              const SizedBox(width: 4),
-              Text(
-                '${post.likes} Likes',
-                style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.bold),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.neonCyan.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.neonCyan.withValues(alpha: 0.2),
+                width: 1,
               ),
-            ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.favorite,
+                    color: AppColors.neonCyan.withValues(alpha: 0.8), size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  '${post.likes} Likes',
+                  style: TextStyle(
+                    color: AppColors.neonCyan.withValues(alpha: 0.9),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

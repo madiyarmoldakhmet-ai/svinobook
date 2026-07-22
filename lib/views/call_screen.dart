@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import '../utils/app_theme.dart';
 
 class CallScreen extends StatefulWidget {
   final String channelId;
@@ -93,7 +94,7 @@ class _CallScreenState extends State<CallScreen> {
           channelProfile: ChannelProfileType.channelProfileCommunication,
         ),
       );
-      
+
       setState(() {
         _isInitialized = true;
       });
@@ -158,153 +159,328 @@ class _CallScreenState extends State<CallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // Remote Video
-          _remoteUid != null
-              ? (_engine != null && _statusText != "Connected (Simulated)"
-                  ? AgoraVideoView(
-                      controller: VideoViewController.remote(
-                        rtcEngine: _engine!,
-                        canvas: VideoCanvas(uid: _remoteUid),
-                        connection: RtcConnection(channelId: widget.channelId.replaceAll(' ', '_')),
-                      ),
-                    )
-                  : Container(
-                      color: const Color(0xFF1A1A1A),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Color(0xFF8B0000),
-                              child: Icon(Icons.person, size: 60, color: Colors.white),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              widget.chatName,
-                              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: Stack(
+          children: [
+            // Remote Video / Loading
+            _remoteUid != null
+                ? (_engine != null && _statusText != "Connected (Simulated)"
+                    ? AgoraVideoView(
+                        controller: VideoViewController.remote(
+                          rtcEngine: _engine!,
+                          canvas: VideoCanvas(uid: _remoteUid),
+                          connection: RtcConnection(channelId: widget.channelId.replaceAll(' ', '_')),
                         ),
-                      ),
-                    ))
-              : Container(
-                  color: Colors.black,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      )
+                    : _buildSimulatedRemoteView())
+                : _buildConnectingView(),
+
+            // Local video
+            if (_localUserJoined && _videoEnabled)
+              Positioned(
+                right: 16,
+                top: MediaQuery.of(context).padding.top + 12,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: 110,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: AppColors.neonCyan.withValues(alpha: 0.4),
+                          width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.neonCyan.withValues(alpha: 0.2),
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    child: _engine != null && _statusText != "Connected (Simulated)"
+                        ? AgoraVideoView(
+                            controller: VideoViewController(
+                              rtcEngine: _engine!,
+                              canvas: const VideoCanvas(uid: 0),
+                            ),
+                          )
+                        : Container(
+                            color: AppColors.bgMid,
+                            child: const Icon(Icons.camera_front,
+                                color: AppColors.neonCyan),
+                          ),
+                  ),
+                ),
+              ),
+
+            // Duration Timer & Status
+            Positioned(
+              left: 16,
+              top: MediaQuery.of(context).padding.top + 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.glassBg,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: AppColors.glassBorder, width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const CircularProgressIndicator(color: Color(0xFF8B0000)),
-                        const SizedBox(height: 24),
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.neonGreen,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.neonGreen
+                                    .withValues(alpha: 0.5),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         Text(
-                          _statusText,
-                          style: const TextStyle(color: Colors.white70, fontSize: 16),
+                          _formatDuration(),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'monospace',
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-
-          // Local video
-          if (_localUserJoined && _videoEnabled)
-            Positioned(
-              right: 16,
-              top: 48,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: SizedBox(
-                  width: 120,
-                  height: 160,
-                  child: _engine != null && _statusText != "Connected (Simulated)"
-                      ? AgoraVideoView(
-                          controller: VideoViewController(
-                            rtcEngine: _engine!,
-                            canvas: const VideoCanvas(uid: 0),
-                          ),
-                        )
-                      : Container(
-                          color: const Color(0xFF2D2D2D),
-                          child: const Icon(Icons.camera_front, color: Colors.white54),
-                        ),
-                ),
+                  const SizedBox(height: 6),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: Text(
+                      _statusText,
+                      style: TextStyle(
+                        color: AppColors.neonCyan.withValues(alpha: 0.7),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
-          // Duration Timer
-          Positioned(
-            left: 16,
-            top: 48,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+            // Remote name overlay
+            if (_remoteUid != null && _statusText == "Connected (Simulated)")
+              Positioned(
+                bottom: 180,
+                left: 0,
+                right: 0,
+                child: Column(
                   children: [
                     Container(
-                      width: 10,
-                      height: 10,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF8B0000),
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
+                        gradient: AppColors.primaryGradient,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.neonCyan.withValues(alpha: 0.4),
+                            blurRadius: 30,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.chatName.isNotEmpty
+                              ? widget.chatName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: AppColors.bgDarkest,
+                            fontSize: 48,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(height: 16),
                     Text(
-                      _formatDuration(),
-                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                      widget.chatName,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Channel: ${widget.channelId}",
-                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+
+            // Bottom control panel
+            Positioned(
+              bottom: 60,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildControlButton(
+                    icon: _muted ? Icons.mic_off_rounded : Icons.mic_rounded,
+                    onPressed: _toggleMute,
+                    isActive: _muted,
+                  ),
+                  const SizedBox(width: 24),
+                  // End call button
+                  GestureDetector(
+                    onTap: _endCall,
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppColors.danger,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.danger.withValues(alpha: 0.5),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.call_end_rounded,
+                          color: Colors.white, size: 32),
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  _buildControlButton(
+                    icon: _videoEnabled
+                        ? Icons.videocam_rounded
+                        : Icons.videocam_off_rounded,
+                    onPressed: _toggleVideo,
+                    isActive: !_videoEnabled,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    bool isActive = false,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.neonCyan : AppColors.glassBg,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isActive
+                ? AppColors.neonCyan
+                : AppColors.glassBorder,
+            width: 1,
+          ),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: AppColors.neonCyan.withValues(alpha: 0.4),
+                    blurRadius: 16,
+                  ),
+                ]
+              : null,
+        ),
+        child: Icon(
+          icon,
+          color: isActive ? AppColors.bgDarkest : AppColors.textPrimary,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConnectingView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: AppColors.primaryGradient,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.neonCyan.withValues(alpha: 0.4),
+                  blurRadius: 30,
+                  spreadRadius: 4,
                 ),
               ],
             ),
+            child: Center(
+              child: Text(
+                widget.chatName.isNotEmpty
+                    ? widget.chatName[0].toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  color: AppColors.bgDarkest,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
           ),
-
-          // Bottom control panel
-          Positioned(
-            bottom: 48,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: _muted ? Colors.white : Colors.white24,
-                  child: IconButton(
-                    icon: Icon(_muted ? Icons.mic_off : Icons.mic, color: _muted ? Colors.black : Colors.white),
-                    onPressed: _toggleMute,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                CircleAvatar(
-                  radius: 36,
-                  backgroundColor: const Color(0xFF8B0000),
-                  child: IconButton(
-                    icon: const Icon(Icons.call_end, color: Colors.white, size: 28),
-                    onPressed: _endCall,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: _videoEnabled ? Colors.white24 : Colors.white,
-                  child: IconButton(
-                    icon: Icon(_videoEnabled ? Icons.videocam : Icons.videocam_off, color: _videoEnabled ? Colors.white : Colors.black),
-                    onPressed: _toggleVideo,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 24),
+          const SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              color: AppColors.neonCyan,
+              strokeWidth: 2.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Calling ${widget.chatName}...',
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _statusText,
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 13,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSimulatedRemoteView() {
+    return Container(
+      color: AppColors.bgDarkest,
+      child: const SizedBox.expand(),
     );
   }
 }

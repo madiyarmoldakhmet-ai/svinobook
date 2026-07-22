@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../widgets/anime_background.dart';
+import '../utils/app_theme.dart';
+import '../widgets/custom_text_field.dart';
 
 class ProjectShowcaseView extends StatefulWidget {
   const ProjectShowcaseView({super.key});
@@ -29,76 +30,96 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
     _descController.clear();
     _imageUrlController.clear();
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF121212),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFF8B0000), width: 1.5),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.bgMid,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
-          title: const Text(
-            'Share Achievement',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          content: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextField(
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.glassBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text(
+                  'Share an Achievement',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 22,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Inspire the community with your work.',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+                ),
+                const SizedBox(height: 24),
+                CustomTextField(
                   controller: _titleController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    labelStyle: TextStyle(color: Colors.white60),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF8B0000))),
-                  ),
+                  hintText: 'Title',
+                  prefixIcon: const Icon(Icons.title,
+                      color: AppColors.neonCyan, size: 20),
                 ),
-                const SizedBox(height: 12),
-                TextField(
+                const SizedBox(height: 14),
+                CustomTextField(
                   controller: _descController,
-                  maxLines: 3,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    labelStyle: TextStyle(color: Colors.white60),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF8B0000))),
-                  ),
+                  hintText: 'Description',
+                  prefixIcon: const Icon(Icons.description,
+                      color: AppColors.neonCyan, size: 20),
+                ),
+                const SizedBox(height: 14),
+                CustomTextField(
+                  controller: _imageUrlController,
+                  hintText: 'Image URL (optional)',
+                  keyboardType: TextInputType.url,
+                  prefixIcon: const Icon(Icons.link,
+                      color: AppColors.neonCyan, size: 20),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: _saveProject,
+                        child: const Text('Post'),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: _imageUrlController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Image URL',
-                    labelStyle: TextStyle(color: Colors.white60),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF8B0000))),
-                  ),
-                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B0000),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              onPressed: _saveProject,
-              child: const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -118,7 +139,10 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
     if (user == null) return;
 
     // Fetch user details
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
     String name = user.email?.split('@')[0] ?? 'User';
     String? avatarUrl;
     if (userDoc.exists) {
@@ -143,7 +167,7 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
     if (mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Project shared!')),
+        const SnackBar(content: Text('Project shared! 🎉')),
       );
     }
   }
@@ -156,168 +180,272 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.85),
-        elevation: 0,
-        title: const Text(
-          'NEXUS DISCOVER',
-          style: TextStyle(
-            color: Color(0xFF8B0000),
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            letterSpacing: 1.5,
-            fontFamily: 'Oswald',
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_photo_alternate, color: Color(0xFF8B0000), size: 28),
-            onPressed: _showAddProjectDialog,
-          ),
-        ],
-      ),
-      body: AnimeBackground(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('projects')
-              .orderBy('createdAt', descending: true)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: Color(0xFF8B0000)));
-            }
-            if (snapshot.hasError) {
-              return Center(
-                child: Text(
-                  'Error loading showcase: ${snapshot.error}',
-                  style: const TextStyle(color: Colors.white70),
-                ),
-              );
-            }
+    final topPad = MediaQuery.of(context).padding.top;
 
-            final docs = snapshot.data?.docs ?? [];
-            if (docs.isEmpty) {
-              return const Center(
-                child: Text(
-                  'The world is empty... post something.',
-                  style: TextStyle(color: Colors.white60, fontSize: 16, fontStyle: FontStyle.italic),
-                ),
-              );
-            }
-
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                final doc = docs[index];
-                final data = doc.data() as Map<String, dynamic>;
-                final title = data['title'] ?? 'Untitled';
-                final desc = data['description'] ?? '';
-                final imageUrl = data['imageUrl'] as String?;
-                final userName = data['userName'] ?? 'Unknown';
-                final userPhotoUrl = data['userPhotoUrl'] as String?;
-                final likes = data['likes'] ?? 0;
-                final timestamp = (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
-
-                return Card(
-                  color: Colors.black.withOpacity(0.75),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Color(0xFF8B0000), width: 0.8),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(
+          children: [
+            // ── Header ──
+            Container(
+              padding: EdgeInsets.only(
+                top: topPad + 16,
+                left: 20,
+                right: 12,
+                bottom: 16,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.neonCyan.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.explore_rounded,
+                        color: AppColors.bgDarkest),
                   ),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: const Color(0xFF8B0000),
-                              backgroundImage: userPhotoUrl != null && userPhotoUrl.isNotEmpty
-                                  ? NetworkImage(userPhotoUrl)
-                                  : null,
-                              child: userPhotoUrl == null || userPhotoUrl.isEmpty
-                                  ? Text(
-                                      userName.isNotEmpty ? userName[0].toUpperCase() : '?',
-                                      style: const TextStyle(color: Colors.white),
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  userName,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                                ),
-                                Text(
-                                  DateFormat.yMMMd().add_jm().format(timestamp),
-                                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Text(
+                      'Discover',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 28,
+                        letterSpacing: -0.5,
                       ),
-                      if (imageUrl != null && imageUrl.isNotEmpty)
-                        ClipRRect(
-                          child: Image.network(
-                            imageUrl,
-                            width: double.infinity,
-                            height: 220,
-                            fit: BoxFit.cover,
-                            errorBuilder: (c, e, s) => Container(
-                              height: 120,
-                              color: Colors.white12,
-                              child: const Center(child: Icon(Icons.broken_image, color: Colors.white60)),
-                            ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _showAddProjectDialog,
+                    icon: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.neonCyan.withValues(alpha: 0.3),
+                            blurRadius: 12,
                           ),
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
+                        ],
+                      ),
+                      child: const Icon(Icons.add_rounded,
+                          color: AppColors.bgDarkest, size: 24),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Feed ──
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('projects')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.neonCyan),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Error loading showcase: ${snapshot.error}',
+                        style: const TextStyle(color: AppColors.textSecondary),
+                      ),
+                    );
+                  }
+
+                  final docs = snapshot.data?.docs ?? [];
+                  if (docs.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.auto_awesome,
+                              size: 64,
+                              color: AppColors.neonCyan.withValues(alpha: 0.3)),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Nothing here yet',
+                            style: TextStyle(
+                                color: AppColors.textMuted, fontSize: 16),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Be the first to share!',
+                            style: TextStyle(
+                                color: AppColors.neonCyan
+                                    .withValues(alpha: 0.6),
+                                fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      final doc = docs[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      final title = data['title'] ?? 'Untitled';
+                      final desc = data['description'] ?? '';
+                      final imageUrl = data['imageUrl'] as String?;
+                      final userName = data['userName'] ?? 'Unknown';
+                      final userPhotoUrl = data['userPhotoUrl'] as String?;
+                      final likes = data['likes'] ?? 0;
+                      final timestamp =
+                          (data['createdAt'] as Timestamp?)?.toDate() ??
+                              DateTime.now();
+
+                      return GlassCard(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        borderRadius: 20,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              title,
-                              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Row(
+                                children: [
+                                  GradientAvatar(
+                                    name: userName,
+                                    radius: 20,
+                                    backgroundImage: (userPhotoUrl != null &&
+                                            userPhotoUrl.isNotEmpty)
+                                        ? NetworkImage(userPhotoUrl)
+                                        : null,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          userName,
+                                          style: const TextStyle(
+                                            color: AppColors.textPrimary,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        Text(
+                                          DateFormat.yMMMd()
+                                              .add_jm()
+                                              .format(timestamp),
+                                          style: TextStyle(
+                                              color: AppColors.textMuted,
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              desc,
-                              style: const TextStyle(color: Colors.white70, fontSize: 14),
+                            if (imageUrl != null && imageUrl.isNotEmpty)
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                    bottom: Radius.circular(0)),
+                                child: Image.network(
+                                  imageUrl,
+                                  width: double.infinity,
+                                  height: 220,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (c, e, s) => Container(
+                                    height: 200,
+                                    color: AppColors.glassBg,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                          color: AppColors.neonCyan),
+                                    ),
+                                  ),
+                                  errorBuilder: (c, e, s) => Container(
+                                    height: 120,
+                                    color: AppColors.glassBg,
+                                    child: const Center(
+                                        child: Icon(Icons.broken_image,
+                                            color: AppColors.textMuted)),
+                                  ),
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    desc,
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 14,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                                color: AppColors.glassBorder, height: 1),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.local_fire_department,
+                                        color: AppColors.neonCyan
+                                            .withValues(alpha: 0.8)),
+                                    onPressed: () => _supportProject(
+                                        doc.id, likes),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$likes Support',
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const Divider(color: Colors.white24, height: 1),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.local_fire_department, color: Color(0xFF8B0000)),
-                              onPressed: () => _supportProject(doc.id, likes),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$likes Support',
-                              style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
