@@ -67,6 +67,7 @@ class CallService {
     await session.peer.setLocalDescription(offer);
     await callRef.set({
       'callerId': _uid,
+      'callerName': _auth.currentUser?.displayName ?? _auth.currentUser?.email?.split('@').first ?? 'Svinobook user',
       'calleeId': targetUserId,
       'offer': {'sdp': offer.sdp, 'type': offer.type},
       'status': 'calling',

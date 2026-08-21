@@ -19,7 +19,9 @@ service cloud.firestore {
       allow delete: if callParticipant();
 
       match /candidates/{candidateId} {
-        allow read, write: if callParticipant();
+        allow read, write: if signedIn() &&
+          (get(/databases/$(database)/documents/calls/$(callId)).data.callerId == request.auth.uid ||
+           get(/databases/$(database)/documents/calls/$(callId)).data.calleeId == request.auth.uid);
       }
     }
 
