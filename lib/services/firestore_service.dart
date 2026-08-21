@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/post_model.dart';
 import '../models/chat_message_model.dart';
 import '../models/chat_session_model.dart';
+import '../models/task_card_model.dart';
+import '../services/ai_agent_service.dart';
 import 'storage_service.dart';
 
 class FirestoreService {
@@ -135,7 +137,7 @@ class FirestoreService {
       );
     }
 
-    await _db.collection('global_chat').add({
+    final messageRef = await _db.collection('global_chat').add({
       'senderId': senderId,
       'senderName': senderName,
       'text': text,
@@ -143,6 +145,17 @@ class FirestoreService {
       'timestamp': FieldValue.serverTimestamp(),
       'type': imageUrl != null ? 'image' : 'text',
     });
+
+    final task = AiAgentService.extractTaskFromText(text);
+    if (task != null) {
+      final taskRef = _db.collection('tasks').doc();
+      await taskRef.set({
+        ...task.toMap(),
+        'createdAt': FieldValue.serverTimestamp(),
+        'sourceMessageId': messageRef.id,
+        'sourceType': 'ai',
+      });
+    }
   }
 
   // --- Direct & Group Messages ---
@@ -242,6 +255,46 @@ class FirestoreService {
         currentUserId: 0,
       },
     }, SetOptions(merge: true));
+  }
+
+  // --- Task cards ---
+  Stream<List<TaskCardModel>> getTasksStream() {
+    return _db
+        .collection('tasks')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TaskCardModel.fromMap(doc.data(), doc.id))
+            .toList());
+  }
+
+  Future<void> createTaskFromText(String rawText, {String assigneeName = 'AI Assistant'}) async {
+    final task = AiAgentService.extractTaskFromText(rawText);
+    if (task == null) return;
+
+    final sanitizedTask = TaskCardModel(
+      id: _db.collection('tasks').doc().id,
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      status: task.status,
+      assigneeName: assigneeName,
+      createdAt: task.createdAt,
+      dueDate: task.dueDate,
+      sourceType: 'ai',
+      metadata: task.metadata,
+    );
+
+    await _db.collection('tasks').doc(sanitizedTask.id).set({
+      ...sanitizedTask.toMap(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> toggleTaskStatus(String taskId, bool done) async {
+    await _db.collection('tasks').doc(taskId).update({
+      'status': done ? 'done' : 'open',
+    });
   }
 
 }
