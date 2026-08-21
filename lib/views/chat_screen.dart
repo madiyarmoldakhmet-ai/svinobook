@@ -84,15 +84,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final bytes = await ImagePickerHelper.pickImage();
-    if (bytes != null) {
-      setState(() {
-        _selectedImageBytes = bytes;
-      });
-    }
-  }
-
   Future<void> _pickMedia({required bool video, ImageSource source = ImageSource.gallery}) async {
     try {
       final media = video
