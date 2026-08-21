@@ -32,8 +32,10 @@ class SecurityAlertService {
     try {
       _server = await HttpServer.bind(InternetAddress.anyIPv4, port, shared: true);
       _isListening = true;
+      print('Security alert listener started on port $port');
     } catch (_) {
       _isListening = false;
+      print('Security alert listener could not bind to port $port');
       return;
     }
 
