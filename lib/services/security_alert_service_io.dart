@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:developer' as developer;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -32,10 +33,10 @@ class SecurityAlertService {
     try {
       _server = await HttpServer.bind(InternetAddress.anyIPv4, port, shared: true);
       _isListening = true;
-      print('Security alert listener started on port $port');
+      developer.log('Security alert listener started on port $port', name: 'SecurityAlertService');
     } catch (_) {
       _isListening = false;
-      print('Security alert listener could not bind to port $port');
+      developer.log('Security alert listener could not bind to port $port', name: 'SecurityAlertService');
       return;
     }
 

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
+import 'dart:developer' as developer;
 
 class ImagePickerHelper {
   static final ImagePicker _picker = ImagePicker();
@@ -14,7 +15,7 @@ class ImagePickerHelper {
         return await file.readAsBytes();
       }
     } catch (e) {
-      print('Error picking image: $e');
+      developer.log('Error picking image: $e', name: 'ImagePickerHelper');
     }
     return null;
   }

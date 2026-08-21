@@ -10,6 +10,8 @@
 analyzer:
   exclude:
     - build/**
+    - node_modules/**
+    - flutter_application_1/**
     - android/**
     - ios/**
     - web/**

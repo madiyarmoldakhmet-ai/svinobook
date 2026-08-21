@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer' as developer;
 import '../models/user_model.dart';
 
 class AuthService {
@@ -32,7 +33,7 @@ class AuthService {
       }
       return credential;
     } catch (e) {
-      print('Error during sign up: $e');
+      developer.log('Error during sign up: $e', name: 'AuthService');
       rethrow;
     }
   }
@@ -45,7 +46,7 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('Error during sign in: $e');
+      developer.log('Error during sign in: $e', name: 'AuthService');
       rethrow;
     }
   }
