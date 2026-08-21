@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+
+    function callParticipant() {
+      return signedIn() &&
+        (resource.data.callerId == request.auth.uid ||
+         resource.data.calleeId == request.auth.uid);
+    }
+
+    match /calls/{callId} {
+      allow read: if callParticipant();
+      allow create: if signedIn() && request.resource.data.callerId == request.auth.uid;
+      allow update: if callParticipant() &&
+        request.resource.data.callerId == resource.data.callerId &&
+        request.resource.data.calleeId == resource.data.calleeId;
+      allow delete: if callParticipant();
+
+      match /candidates/{candidateId} {
+        allow read, write: if callParticipant();
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if signedIn();
+    }
+  }
+}
