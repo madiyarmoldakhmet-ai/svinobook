@@ -230,10 +230,10 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                       final msg = messages[index];
                       if (msg.type == 'security_alert') {
                         final alert = SecurityAlertModel(
-                          source: msg.senderName,
-                          type: msg.data()['alertType'] ?? 'Port_Scan',
-                          status: msg.data()['alertStatus'] ?? 'WARNING',
-                          details: msg.data()['alertDetails'] ?? msg.text,
+                          source: msg.alertSource ?? msg.senderName,
+                          type: msg.alertType ?? 'Port_Scan',
+                          status: msg.alertStatus ?? 'WARNING',
+                          details: msg.alertDetails ?? msg.text,
                           createdAt: msg.timestamp,
                         );
                         return SecurityAlertCard(alert: alert);

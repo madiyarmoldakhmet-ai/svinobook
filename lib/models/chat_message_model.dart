@@ -11,6 +11,10 @@ class ChatMessageModel {
   final bool isGroup;
   final String chatRoomId;
   final String type;
+  final String? alertType;
+  final String? alertStatus;
+  final String? alertDetails;
+  final String? alertSource;
 
   ChatMessageModel({
     required this.id,
@@ -23,6 +27,10 @@ class ChatMessageModel {
     required this.isGroup,
     required this.chatRoomId,
     required this.type,
+    this.alertType,
+    this.alertStatus,
+    this.alertDetails,
+    this.alertSource,
   });
 
   factory ChatMessageModel.fromMap(Map<String, dynamic> data, String documentId) {
@@ -38,6 +46,10 @@ class ChatMessageModel {
       isGroup: data['isGroup'] ?? false,
       chatRoomId: data['chatRoomId'] ?? '',
       type: data['type'] ?? (img != null && img.isNotEmpty ? 'image' : 'text'),
+      alertType: data['alertType'] as String?,
+      alertStatus: data['alertStatus'] as String?,
+      alertDetails: data['alertDetails'] as String?,
+      alertSource: data['alertSource'] as String?,
     );
   }
 
@@ -52,6 +64,10 @@ class ChatMessageModel {
       'isGroup': isGroup,
       'chatRoomId': chatRoomId,
       'type': type,
+      'alertType': alertType,
+      'alertStatus': alertStatus,
+      'alertDetails': alertDetails,
+      'alertSource': alertSource,
     };
   }
 }
