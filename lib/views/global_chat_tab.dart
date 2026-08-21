@@ -7,6 +7,7 @@ import '../models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
+import '../services/ai_agent_service.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/security_alert_card.dart';
 import '../utils/image_picker_helper.dart';
@@ -25,6 +26,9 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
   final _messageController = TextEditingController();
   Uint8List? _selectedImageBytes;
   bool _isSending = false;
+  bool _isAiSending = false;
+  String _selectedAiModel = AiAgentService.localModels.first;
+  final List<String> _aiReplies = [];
 
   @override
   void dispose() {
@@ -45,6 +49,30 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
     setState(() {
       _selectedImageBytes = null;
     });
+  }
+
+  Future<void> _askLocalAi() async {
+    final prompt = _messageController.text.trim();
+    if (prompt.isEmpty || _isAiSending) return;
+    setState(() => _isAiSending = true);
+    try {
+      final reply = await AiAgentService.chatWithLocalModel(
+        prompt: prompt,
+        model: _selectedAiModel,
+      );
+      if (mounted) {
+        setState(() => _aiReplies.insert(0, reply));
+        _messageController.clear();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ollama is unavailable: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isAiSending = false);
+    }
   }
 
   void _sendMessage() async {
@@ -250,6 +278,12 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         reverse: true,
                         padding: const EdgeInsets.only(bottom: 8),
                         children: [
+                          ..._aiReplies.map((reply) => ChatBubble(
+                                text: reply,
+                                senderName: _selectedAiModel,
+                                timestamp: DateTime.now(),
+                                isMe: false,
+                              )),
                           ...messages.map((msg) {
                             if (msg.type == 'security_alert') {
                               final alert = SecurityAlertModel(
@@ -375,6 +409,30 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                               size: 20),
                         ),
                         onPressed: _pickImage,
+                      ),
+                      PopupMenuButton<String>(
+                        tooltip: 'Choose local AI model',
+                        initialValue: _selectedAiModel,
+                        onSelected: (model) => setState(() => _selectedAiModel = model),
+                        itemBuilder: (context) => AiAgentService.localModels
+                            .map((model) => PopupMenuItem(value: model, child: Text(model)))
+                            .toList(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Text(
+                            _selectedAiModel.split(':').first,
+                            style: const TextStyle(color: AppColors.neonCyan, fontSize: 11),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Ask local AI',
+                        onPressed: _askLocalAi,
+                        icon: Icon(
+                          Icons.auto_awesome,
+                          color: _isAiSending ? AppColors.textMuted : AppColors.neonCyan,
+                          size: 19,
+                        ),
                       ),
                       Expanded(
                         child: TextField(

@@ -19,8 +19,7 @@ class StorageService {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
-      print('Error uploading image to storage: $e');
-      return null;
+      throw Exception('Image upload failed. Check Firebase Storage rules: $e');
     }
   }
 }

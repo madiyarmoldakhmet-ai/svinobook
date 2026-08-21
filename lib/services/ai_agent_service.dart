@@ -5,6 +5,12 @@ import 'package:http/http.dart' as http;
 import '../models/task_card_model.dart';
 
 class AiAgentService {
+  static const localModels = [
+    'qwen2.5:14b',
+    'gpt-oss:20b',
+    'llava',
+    'llama3.2',
+  ];
   static final RegExp _taskTrigger = RegExp(
     r'(?:create|add|new)\s+(?:a\s+)?(?:task|todo|reminder)|\b(?:task|todo|reminder|follow up|follow-up)\b',
     caseSensitive: false,
@@ -185,6 +191,33 @@ class AiAgentService {
       'message': 'Local AI endpoint unavailable; using regex fallback.',
       'task': extractTaskFromText(prompt),
     };
+  }
+
+  static Future<String> chatWithLocalModel({
+    required String prompt,
+    required String model,
+    String endpoint = 'http://localhost:11434/api/generate',
+  }) async {
+    final response = await http
+        .post(
+          Uri.parse(endpoint),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'model': model,
+            'prompt': prompt,
+            'stream': false,
+          }),
+        )
+        .timeout(const Duration(seconds: 60));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Ollama returned HTTP ${response.statusCode}');
+    }
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    final text = (decoded['response'] ?? decoded['content'] ?? '').toString().trim();
+    if (text.isEmpty) throw Exception('Ollama returned an empty response');
+    return text;
   }
 
   static TaskCardModel? _taskFromAiText(String text) {
