@@ -1,68 +1,64 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-/// ═══════════════════════════════════════════════════════════════
-///  Svinobook — Modern Design System
-///  A cohesive dark glassmorphic theme with neon cyan/blue accents.
-/// ═══════════════════════════════════════════════════════════════
+/// Svinobook's compact early-social-network visual system.
 
 class AppColors {
   AppColors._();
 
-  // ── Core backgrounds ──
-  static const bgDarkest = Color(0xFF0B0E14);
-  static const bgDark = Color(0xFF12161F);
-  static const bgMid = Color(0xFF1A1F2C);
-  static const bgLight = Color(0xFF232938);
+  // ── VK-era blue and gray surfaces ──
+  static const bgDarkest = Color(0xFFE7EEF5);
+  static const bgDark = Color(0xFFD7E3EE);
+  static const bgMid = Color(0xFFFFFFFF);
+  static const bgLight = Color(0xFFF3F6F9);
 
-  // ── Neon accents ──
-  static const neonCyan = Color(0xFF00E5FF);
-  static const neonBlue = Color(0xFF448AFF);
-  static const neonPurple = Color(0xFF7C4DFF);
-  static const neonGreen = Color(0xFF50FA7B);
+  // ── Classic interface blue ──
+  static const neonCyan = Color(0xFF4A76A8);
+  static const neonBlue = Color(0xFF527DA8);
+  static const neonPurple = Color(0xFF527DA8);
+  static const neonGreen = Color(0xFF4D9B6A);
 
   // ── Glassmorphism ──
-  static const glassBg = Color(0x14FFFFFF); // ~8% white
-  static const glassBorder = Color(0x26FFFFFF); // ~15% white
-  static const glassHighlight = Color(0x1FFFFFFF);
+  static const glassBg = Color(0xFFFFFFFF);
+  static const glassBorder = Color(0xFFC7D5E0);
+  static const glassHighlight = Color(0xFFF8FAFC);
 
   // ── Semantic ──
-  static const textPrimary = Color(0xFFF5F7FA);
-  static const textSecondary = Color(0xB3FFFFFF); // 70%
-  static const textMuted = Color(0x66FFFFFF); // 40%
-  static const danger = Color(0xFFFF5252);
-  static const success = Color(0xFF50FA7B);
+  static const textPrimary = Color(0xFF2B4053);
+  static const textSecondary = Color(0xFF607D94);
+  static const textMuted = Color(0xFF91A4B4);
+  static const danger = Color(0xFFD45B5B);
+  static const success = Color(0xFF4D9B6A);
 
   // ── Gradients ──
   static const primaryGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [neonCyan, neonBlue],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF5C89B5), Color(0xFF426C9A)],
   );
 
   static const accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [neonCyan, neonPurple],
+    colors: [Color(0xFF5C89B5), Color(0xFF426C9A)],
   );
 
   static const backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [bgDarkest, bgMid, bgDarkest],
+    colors: [Color(0xFFDDE9F3), Color(0xFFF7F9FB), Color(0xFFE2ECF4)],
     stops: [0.0, 0.5, 1.0],
   );
 }
 
-/// Modern Material 3 theme for the entire app.
+/// Compact light theme for the entire app.
 class AppTheme {
   AppTheme._();
 
   static ThemeData get darkTheme {
-    const scheme = ColorScheme.dark(
+    const scheme = ColorScheme.light(
       primary: AppColors.neonCyan,
-      onPrimary: Color(0xFF0B0E14),
+      onPrimary: Colors.white,
       secondary: AppColors.neonBlue,
       onSecondary: Colors.white,
       tertiary: AppColors.neonPurple,
@@ -72,12 +68,10 @@ class AppTheme {
       onError: Colors.white,
     );
 
-    final base = GoogleFonts.interTextTheme(
-      const TextTheme(
+    const base = TextTheme(
         displayLarge: TextStyle(
           color: AppColors.textPrimary,
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.5,
+          fontWeight: FontWeight.w700,
         ),
         headlineMedium: TextStyle(
           color: AppColors.textPrimary,
@@ -87,27 +81,26 @@ class AppTheme {
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,
         ),
-        bodyLarge: TextStyle(color: AppColors.textPrimary, height: 1.5),
-        bodyMedium: TextStyle(color: AppColors.textSecondary, height: 1.5),
+        bodyLarge: TextStyle(color: AppColors.textPrimary, height: 1.35),
+        bodyMedium: TextStyle(color: AppColors.textSecondary, height: 1.35),
         labelLarge: TextStyle(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,
         ),
-      ),
-    );
+      );
 
     return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
+      useMaterial3: false,
+      brightness: Brightness.light,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.bgDarkest,
       textTheme: base,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.neonCyan,
         foregroundColor: AppColors.textPrimary,
-        elevation: 0,
+        elevation: 1,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: const TextStyle(
           color: AppColors.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w700,
@@ -116,34 +109,34 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.glassBg,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         hintStyle: TextStyle(color: AppColors.textMuted),
         labelStyle: TextStyle(color: AppColors.textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.all(Radius.circular(3)),
+          borderSide: BorderSide(color: AppColors.glassBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.all(Radius.circular(3)),
           borderSide: BorderSide(color: AppColors.glassBorder, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.neonCyan, width: 1.5),
+          borderRadius: BorderRadius.all(Radius.circular(3)),
+          borderSide: const BorderSide(color: AppColors.neonCyan, width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.neonCyan,
           foregroundColor: AppColors.bgDarkest,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          elevation: 1,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(3),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -164,7 +157,7 @@ class AppTheme {
         contentTextStyle: const TextStyle(color: AppColors.textPrimary),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(3),
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -180,7 +173,7 @@ class AppTheme {
   }
 }
 
-/// A reusable glassmorphic container widget.
+/// A reusable flat panel used throughout the app.
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -205,13 +198,13 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final br = BorderRadius.circular(borderRadius);
+    final br = BorderRadius.circular(borderRadius > 3 ? 4 : borderRadius);
     return Container(
       margin: margin,
       child: ClipRRect(
         borderRadius: br,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
@@ -219,7 +212,13 @@ class GlassCard extends StatelessWidget {
               borderRadius: br,
               border: border ??
                   Border.all(color: AppColors.glassBorder, width: 1),
-              boxShadow: boxShadow,
+              boxShadow: boxShadow ?? const [
+                BoxShadow(
+                  color: Color(0x18000000),
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
             child: child,
           ),

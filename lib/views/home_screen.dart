@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'project_showcase_view.dart';
@@ -88,72 +87,48 @@ class _GlassNavBar extends StatelessWidget {
       _NavItem(icon: Icons.person_rounded, label: 'Profile'),
     ];
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          decoration: BoxDecoration(
-            color: AppColors.bgDark.withValues(alpha: 0.85),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.glassBorder, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+      decoration: BoxDecoration(
+        color: AppColors.bgMid,
+        border: Border.all(color: AppColors.glassBorder),
+        boxShadow: const [
+          BoxShadow(color: Color(0x22000000), blurRadius: 3, offset: Offset(0, 1)),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(items.length, (i) {
+          final item = items[i];
+          final selected = i == currentIndex;
+          return GestureDetector(
+            onTap: () => onTap(i),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+              decoration: BoxDecoration(
+                color: selected ? const Color(0xFFE2EDF7) : Colors.transparent,
+                border: selected ? Border.all(color: const Color(0xFFB8CBDE)) : null,
+                borderRadius: BorderRadius.circular(3),
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (i) {
-              final item = items[i];
-              final selected = i == currentIndex;
-              return GestureDetector(
-                onTap: () => onTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: selected ? 16 : 12,
-                    vertical: 10,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(item.icon, color: selected ? AppColors.neonCyan : AppColors.textMuted, size: 19),
+                  const SizedBox(height: 2),
+                  Text(
+                    item.label,
+                    style: TextStyle(
+                      color: selected ? AppColors.neonCyan : AppColors.textMuted,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                      fontSize: 10,
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    gradient: selected ? AppColors.primaryGradient : null,
-                    color: selected ? null : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        item.icon,
-                        color: selected
-                            ? AppColors.bgDarkest
-                            : AppColors.textMuted,
-                        size: 22,
-                      ),
-                      if (selected) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          item.label,
-                          style: const TextStyle(
-                            color: AppColors.bgDarkest,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
