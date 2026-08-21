@@ -25,8 +25,36 @@ service cloud.firestore {
       }
     }
 
-    match /{document=**} {
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /posts/{postId} {
       allow read, write: if signedIn();
+    }
+
+    match /global_chat/{messageId} {
+      allow read, write: if signedIn();
+    }
+
+    match /tasks/{taskId} {
+      allow read, write: if signedIn();
+    }
+
+    match /projects/{projectId} {
+      allow read, write: if signedIn();
+    }
+
+    match /security_alerts/{alertId} {
+      allow read, write: if signedIn();
+    }
+
+    match /group_chats/{chatId} {
+      allow read, write: if signedIn();
+      match /messages/{messageId} {
+        allow read, write: if signedIn();
+      }
     }
   }
 }
