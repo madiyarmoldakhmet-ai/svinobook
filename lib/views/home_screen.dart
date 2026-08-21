@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'project_showcase_view.dart';
 import 'global_chat_tab.dart';
 import 'direct_messages_tab.dart';
+import 'tasks_tab.dart';
 import 'profile_tab.dart';
 import '../services/firestore_service.dart';
 import '../services/system_health_service.dart';
@@ -39,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ProjectShowcaseView(),
     GlobalChatTab(),
     DirectMessagesTab(),
+    TasksTab(),
     ProfileTab(),
   ];
 
@@ -79,6 +81,7 @@ class _GlassNavBar extends StatelessWidget {
       _NavItem(icon: Icons.explore_rounded, label: 'Discover'),
       _NavItem(icon: Icons.public_rounded, label: 'Global'),
       _NavItem(icon: Icons.forum_rounded, label: 'Messages'),
+      _NavItem(icon: Icons.checklist_rounded, label: 'Tasks'),
       _NavItem(icon: Icons.person_rounded, label: 'Profile'),
     ];
 

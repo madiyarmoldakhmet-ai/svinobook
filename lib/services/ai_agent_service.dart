@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:http/http.dart' as http;
 
 import '../models/task_card_model.dart';
 
@@ -138,27 +141,73 @@ class AiAgentService {
 
   static Future<Map<String, dynamic>> callLocalQwen({
     required String prompt,
-    String endpoint = 'http://127.0.0.1:11434/api/chat',
+    String endpoint = 'http://localhost:11434/api/generate',
   }) async {
-    final requestBody = jsonEncode({
-      'model': 'qwen2.5:latest',
-      'messages': [
-        {'role': 'user', 'content': prompt},
-      ],
-      'stream': false,
-    });
+    final endpoints = [
+      endpoint,
+      'http://localhost:8080/v1/chat/completions',
+      'http://127.0.0.1:11434/api/generate',
+    ];
 
-    final response = await _safeHttpPost(endpoint, requestBody);
-    return response;
+    for (final candidate in endpoints.toSet().toList()) {
+      try {
+        final response = await _postJson(candidate, prompt);
+        if (response['ok'] == true) {
+          return response;
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+
+    return {
+      'ok': false,
+      'fallback': true,
+      'message': 'Local AI endpoint unavailable; using regex fallback.',
+      'task': extractTaskFromText(prompt),
+    };
   }
 
-  static Future<Map<String, dynamic>> _safeHttpPost(String endpoint, String body) async {
-    try {
-      // The app will add the http package in pubspec.yaml; this keeps the call isolated
-      // and safe even when the local Qwen server is offline.
-      return {'ok': false, 'message': 'Local Qwen endpoint unavailable'};
-    } catch (_) {
-      return {'ok': false, 'message': 'Qwen call failed'};
+  static Future<Map<String, dynamic>> _postJson(String endpoint, String prompt) async {
+    final body = endpoint.contains('/v1/chat/completions')
+        ? jsonEncode({
+            'model': 'local-model',
+            'messages': [
+              {'role': 'user', 'content': prompt},
+            ],
+            'temperature': 0.2,
+          })
+        : jsonEncode({
+            'model': 'qwen2.5:latest',
+            'prompt': prompt,
+            'stream': false,
+          });
+
+    final response = await http.post(
+      Uri.parse(endpoint),
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    ).timeout(const Duration(seconds: 4));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      return {'ok': false, 'message': 'Bad response'};
     }
+
+    final decoded = jsonDecode(response.body);
+    if (endpoint.contains('/v1/chat/completions')) {
+      final text = decoded['choices'] is List && decoded['choices'].isNotEmpty
+          ? decoded['choices'][0]['message']['content'] ?? ''
+          : '';
+      return {
+        'ok': text.toString().trim().isNotEmpty,
+        'text': text,
+      };
+    }
+
+    final text = decoded['response'] ?? decoded['content'] ?? '';
+    return {
+      'ok': text.toString().trim().isNotEmpty,
+      'text': text,
+    };
   }
 }
