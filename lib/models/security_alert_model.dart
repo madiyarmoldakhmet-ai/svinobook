@@ -21,6 +21,12 @@ class SecurityAlertModel {
     final severity = (json['severity'] ?? json['status'] ?? 'medium').toString().trim();
     final source = (json['source'] ?? 'External').toString().trim();
     final type = (json['type'] ?? 'port_scan_detected').toString().trim();
+    final rawCreatedAt = json['createdAt'];
+    final createdAt = rawCreatedAt is DateTime
+      ? rawCreatedAt
+      : rawCreatedAt != null && rawCreatedAt.toDate is Function
+        ? rawCreatedAt.toDate() as DateTime
+        : DateTime.now();
 
     return SecurityAlertModel(
       title: title,
@@ -28,7 +34,7 @@ class SecurityAlertModel {
       severity: severity,
       source: source,
       type: type,
-      createdAt: DateTime.now(),
+      createdAt: createdAt,
     );
   }
 

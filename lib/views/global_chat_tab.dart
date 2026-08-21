@@ -177,9 +177,11 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
 
             // ── Messages ──
             Expanded(
-              child: StreamBuilder<List<ChatMessageModel>>(
-                stream:
-                    context.read<FirestoreService>().getGlobalChatStream(),
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('security_alerts')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -190,63 +192,95 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                   if (snapshot.hasError) {
                     return Center(
                       child: Text(
-                        'Error loading chat: ${snapshot.error}',
+                        'Error loading security alerts: ${snapshot.error}',
                         style:
                             const TextStyle(color: AppColors.textSecondary),
                       ),
                     );
                   }
-                  final messages = snapshot.data ?? [];
+                  final alertDocs = snapshot.data?.docs ?? [];
 
-                  if (messages.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.forum_rounded,
-                              size: 56,
-                              color: AppColors.neonCyan
-                                  .withValues(alpha: 0.3)),
-                          const SizedBox(height: 12),
-                          Text('No messages yet',
-                              style:
-                                  TextStyle(color: AppColors.textMuted)),
-                          const SizedBox(height: 4),
-                          Text('Start the conversation!',
-                              style: TextStyle(
-                                  color: AppColors.neonCyan
-                                      .withValues(alpha: 0.6),
-                                  fontSize: 13)),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.only(bottom: 8),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = messages[index];
-                      if (msg.type == 'security_alert') {
-                        final alert = SecurityAlertModel(
-                          title: msg.alertType ?? 'Security Alert',
-                          description: msg.alertDetails ?? msg.text,
-                          severity: (msg.alertStatus ?? 'warning').toLowerCase(),
-                          source: msg.alertSource ?? msg.senderName,
-                          type: msg.alertType ?? 'security_alert',
-                          createdAt: msg.timestamp,
+                  return StreamBuilder<List<ChatMessageModel>>(
+                    stream: context
+                        .read<FirestoreService>()
+                        .getGlobalChatStream(),
+                    builder: (context, messageSnapshot) {
+                      if (messageSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                              color: AppColors.neonCyan),
                         );
-                        return SecurityAlertCard(alert: alert);
+                      }
+                      if (messageSnapshot.hasError) {
+                        return Center(
+                          child: Text(
+                            'Error loading chat: ${messageSnapshot.error}',
+                            style: const TextStyle(
+                                color: AppColors.textSecondary),
+                          ),
+                        );
                       }
 
-                      return ChatBubble(
-                        text: msg.text,
-                        senderName: msg.senderName,
-                        timestamp: msg.timestamp,
-                        isMe: msg.senderId == currentUserId,
-                        imageUrl: msg.imageUrl,
-                        type: msg.type,
+                      final messages = messageSnapshot.data ?? [];
+                      if (messages.isEmpty && alertDocs.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.forum_rounded,
+                                  size: 56,
+                                  color: AppColors.neonCyan
+                                      .withValues(alpha: 0.3)),
+                              const SizedBox(height: 12),
+                              Text('No messages yet',
+                                  style: TextStyle(color: AppColors.textMuted)),
+                              const SizedBox(height: 4),
+                              Text('Start the conversation!',
+                                  style: TextStyle(
+                                      color: AppColors.neonCyan
+                                          .withValues(alpha: 0.6),
+                                      fontSize: 13)),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return ListView(
+                        reverse: true,
+                        padding: const EdgeInsets.only(bottom: 8),
+                        children: [
+                          ...messages.map((msg) {
+                            if (msg.type == 'security_alert') {
+                              final alert = SecurityAlertModel(
+                                title: msg.alertType ?? 'Security Alert',
+                                description: msg.alertDetails ?? msg.text,
+                                severity: (msg.alertStatus ?? 'warning')
+                                    .toLowerCase(),
+                                source: msg.alertSource ?? msg.senderName,
+                                type: msg.alertType ?? 'security_alert',
+                                createdAt: msg.timestamp,
+                              );
+                              return SecurityAlertCard(alert: alert);
+                            }
+
+                            return ChatBubble(
+                              text: msg.text,
+                              senderName: msg.senderName,
+                              timestamp: msg.timestamp,
+                              isMe: msg.senderId == currentUserId,
+                              imageUrl: msg.imageUrl,
+                              type: msg.type,
+                            );
+                          }),
+                          ...alertDocs.map((doc) {
+                            final alert = SecurityAlertModel.fromJson(doc.data());
+                            return SecurityAlertCard(
+                              key: ValueKey('security-alert-${doc.id}'),
+                              alert: alert,
+                            );
+                          }),
+                        ],
                       );
                     },
                   );
