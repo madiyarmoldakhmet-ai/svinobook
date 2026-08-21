@@ -10,6 +10,9 @@ class SecurityAlertService {
   static const List<String> supportedSeverities = ['low', 'medium', 'high', 'critical', 'warning'];
 
   HttpServer? _server;
+  static bool _isListening = false;
+
+  static bool get isListening => _isListening;
 
   Future<void> startAlertListener({int port = 8080}) async {
     if (_server != null) {
@@ -17,6 +20,7 @@ class SecurityAlertService {
     }
 
     _server = await HttpServer.bind(InternetAddress.anyIPv4, port, shared: true);
+    _isListening = true;
 
     _server!.listen((request) async {
       try {
@@ -71,6 +75,7 @@ class SecurityAlertService {
   Future<void> stopServer() async {
     await _server?.close(force: true);
     _server = null;
+    _isListening = false;
   }
 
   SecurityAlertModel? fromPayload(Map<String, dynamic> payload) {
