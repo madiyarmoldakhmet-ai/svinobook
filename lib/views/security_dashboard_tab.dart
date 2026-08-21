@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/security_alert_model.dart';
-import '../services/security_alert_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/security_alert_card.dart';
 
@@ -55,6 +54,17 @@ class _SecurityDashboardTabState extends State<SecurityDashboardTab> {
     await batch.commit();
   }
 
+  Future<void> _createTestAlert() async {
+    await FirebaseFirestore.instance.collection('security_alerts').add({
+      'title': 'Local Security Check',
+      'description': 'Test alert created from the Security Hub.',
+      'severity': 'low',
+      'source': 'Svinobook',
+      'type': 'security_alert',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -85,8 +95,8 @@ class _SecurityDashboardTabState extends State<SecurityDashboardTab> {
                 SliverToBoxAdapter(
                   child: _DashboardHeader(
                     threatDetected: threatDetected,
-                    listenerActive: SecurityAlertService.isListening,
                     onClearOld: docs.isEmpty ? null : _clearOldAlerts,
+                    onCreateTest: _createTestAlert,
                   ),
                 ),
                 SliverToBoxAdapter(
@@ -167,13 +177,13 @@ class _SecurityDashboardTabState extends State<SecurityDashboardTab> {
 
 class _DashboardHeader extends StatelessWidget {
   final bool threatDetected;
-  final bool listenerActive;
   final VoidCallback? onClearOld;
+  final VoidCallback onCreateTest;
 
   const _DashboardHeader({
     required this.threatDetected,
-    required this.listenerActive,
     required this.onClearOld,
+    required this.onCreateTest,
   });
 
   @override
@@ -212,6 +222,12 @@ class _DashboardHeader extends StatelessWidget {
                 ),
               ),
               IconButton(
+                tooltip: 'Create test alert',
+                onPressed: onCreateTest,
+                icon: const Icon(Icons.add_alert_outlined),
+                color: AppColors.neonCyan,
+              ),
+              IconButton(
                 tooltip: 'Clear alerts older than 30 days',
                 onPressed: onClearOld,
                 icon: const Icon(Icons.cleaning_services_outlined),
@@ -227,16 +243,10 @@ class _DashboardHeader extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              Icon(
-                listenerActive ? Icons.radio_button_checked : Icons.error_outline,
-                size: 15,
-                color: listenerActive ? Colors.green.shade300 : AppColors.danger,
-              ),
+              Icon(Icons.cloud_done_outlined, size: 15, color: Colors.green.shade300),
               const SizedBox(width: 6),
               Text(
-                listenerActive
-                    ? 'HTTP listener active • 8080 • Kali link ready'
-                    : 'HTTP listener inactive • port 8080',
+                'Firebase monitoring active • realtime sync',
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
             ],
