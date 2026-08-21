@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:video_player/video_player.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../utils/app_theme.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -124,8 +125,8 @@ class ChatBubble extends StatelessWidget {
                       _VideoAttachment(url: displayUrl)
                     else ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        displayUrl,
+                      child: CachedNetworkImage(
+                        imageUrl: displayUrl,
                         height: 200,
                         width: 200,
                         fit: BoxFit.cover,
