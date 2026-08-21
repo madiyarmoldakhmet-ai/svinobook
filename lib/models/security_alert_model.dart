@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class SecurityAlertModel {
   final String title;
   final String description;
@@ -22,11 +24,11 @@ class SecurityAlertModel {
     final source = (json['source'] ?? 'External').toString().trim();
     final type = (json['type'] ?? 'port_scan_detected').toString().trim();
     final rawCreatedAt = json['createdAt'];
-    final createdAt = rawCreatedAt is DateTime
-      ? rawCreatedAt
-      : rawCreatedAt != null && rawCreatedAt.toDate is Function
-        ? rawCreatedAt.toDate() as DateTime
-        : DateTime.now();
+    final createdAt = rawCreatedAt is Timestamp
+        ? rawCreatedAt.toDate()
+        : rawCreatedAt is DateTime
+            ? rawCreatedAt
+            : DateTime.now();
 
     return SecurityAlertModel(
       title: title,

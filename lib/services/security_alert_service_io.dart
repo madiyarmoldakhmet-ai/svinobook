@@ -42,7 +42,6 @@ class SecurityAlertService {
         if (request.method != 'POST') {
           request.response.statusCode = HttpStatus.methodNotAllowed;
           request.response.write(jsonEncode({'status': 'error', 'message': 'Only POST is allowed'}));
-          await request.response.close();
           return;
         }
 
@@ -50,7 +49,6 @@ class SecurityAlertService {
         if (decoded is! Map<String, dynamic>) {
           request.response.statusCode = HttpStatus.badRequest;
           request.response.write(jsonEncode({'status': 'error', 'message': 'JSON object required'}));
-          await request.response.close();
           return;
         }
 
@@ -58,7 +56,6 @@ class SecurityAlertService {
         if (alert == null) {
           request.response.statusCode = HttpStatus.badRequest;
           request.response.write(jsonEncode({'status': 'error', 'message': 'Invalid alert payload'}));
-          await request.response.close();
           return;
         }
 
