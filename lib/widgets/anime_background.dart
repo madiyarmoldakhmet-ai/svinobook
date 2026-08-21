@@ -47,7 +47,7 @@ class AnimeBackground extends StatelessWidget {
         gradient: AppColors.backgroundGradient,
         image: hasBg
             ? DecorationImage(
-                image: NetworkImage(bgUrl!.trim()),
+                image: NetworkImage(bgUrl.trim()),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   AppColors.bgDarkest.withValues(alpha: 0.72),

@@ -47,15 +47,17 @@ class _FeedTabState extends State<FeedTab> {
         postImageBytes: _selectedImageBytes,
       );
       _postController.clear();
+      if (!mounted) return;
       setState(() {
         _selectedImageBytes = null;
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error creating post: $e')),
       );
     } finally {
-      setState(() => _isPosting = false);
+      if (mounted) setState(() => _isPosting = false);
     }
   }
 
