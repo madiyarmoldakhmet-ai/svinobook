@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/post_model.dart';
 import '../models/chat_message_model.dart';
 import '../models/chat_session_model.dart';
+import '../models/security_alert_model.dart';
 import '../models/task_card_model.dart';
 import '../services/ai_agent_service.dart';
 import 'storage_service.dart';
@@ -144,6 +145,8 @@ class FirestoreService {
       'imageUrl': imageUrl,
       'timestamp': FieldValue.serverTimestamp(),
       'type': imageUrl != null ? 'image' : 'text',
+      'alertType': null,
+      'alertStatus': null,
     });
 
     final task = await AiAgentService.parseTaskFromTextAsync(text);
@@ -156,6 +159,20 @@ class FirestoreService {
         'sourceType': 'ai',
       });
     }
+  }
+
+  Future<void> sendSecurityAlert(SecurityAlertModel alert) async {
+    await _db.collection('global_chat').add({
+      'senderId': 'security_agent',
+      'senderName': 'Security Agent',
+      'text': '${alert.type} • ${alert.status}\n${alert.details}',
+      'timestamp': FieldValue.serverTimestamp(),
+      'type': 'security_alert',
+      'alertType': alert.type,
+      'alertStatus': alert.status,
+      'alertDetails': alert.details,
+      'alertSource': alert.source,
+    });
   }
 
   // --- Direct & Group Messages ---

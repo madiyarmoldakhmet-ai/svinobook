@@ -8,8 +8,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/chat_bubble.dart';
+import '../widgets/security_alert_card.dart';
 import '../utils/image_picker_helper.dart';
 import '../utils/app_theme.dart';
+import '../models/security_alert_model.dart';
 import 'chat_screen.dart';
 
 class GlobalChatTab extends StatefulWidget {
@@ -226,6 +228,17 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
+                      if (msg.type == 'security_alert') {
+                        final alert = SecurityAlertModel(
+                          source: msg.senderName,
+                          type: msg.data()['alertType'] ?? 'Port_Scan',
+                          status: msg.data()['alertStatus'] ?? 'WARNING',
+                          details: msg.data()['alertDetails'] ?? msg.text,
+                          createdAt: msg.timestamp,
+                        );
+                        return SecurityAlertCard(alert: alert);
+                      }
+
                       return ChatBubble(
                         text: msg.text,
                         senderName: msg.senderName,
