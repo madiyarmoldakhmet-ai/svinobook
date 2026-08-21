@@ -6,6 +6,7 @@ class ChatMessageModel {
   final String senderName;
   final String text;
   final String? imageUrl;
+  final String? url;
   final DateTime timestamp;
   final bool isRead;
   final bool isGroup;
@@ -22,6 +23,7 @@ class ChatMessageModel {
     required this.senderName,
     required this.text,
     this.imageUrl,
+    this.url,
     required this.timestamp,
     this.isRead = false,
     required this.isGroup,
@@ -35,12 +37,14 @@ class ChatMessageModel {
 
   factory ChatMessageModel.fromMap(Map<String, dynamic> data, String documentId) {
     final img = data['imageUrl'] as String?;
+    final url = data['url'] as String? ?? img;
     return ChatMessageModel(
       id: documentId,
       senderId: data['senderId'] ?? '',
       senderName: data['senderName'] ?? 'Unknown',
       text: data['text'] ?? '',
       imageUrl: img,
+      url: url,
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isRead: data['isRead'] ?? false,
       isGroup: data['isGroup'] ?? false,
@@ -59,6 +63,7 @@ class ChatMessageModel {
       'senderName': senderName,
       'text': text,
       'imageUrl': imageUrl,
+      'url': url ?? imageUrl,
       'timestamp': Timestamp.fromDate(timestamp),
       'isRead': isRead,
       'isGroup': isGroup,

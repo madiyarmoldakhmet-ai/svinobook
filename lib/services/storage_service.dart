@@ -22,4 +22,22 @@ class StorageService {
       throw Exception('Image upload failed. Check Firebase Storage rules: $e');
     }
   }
+
+  Future<String?> uploadBytes({
+    required Uint8List fileBytes,
+    required String folder,
+    required String fileName,
+    required String contentType,
+  }) async {
+    try {
+      final ref = _storage.ref().child(folder).child(fileName);
+      final snapshot = await ref.putData(
+        fileBytes,
+        SettableMetadata(contentType: contentType),
+      );
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      throw Exception('Media upload failed: $e');
+    }
+  }
 }
