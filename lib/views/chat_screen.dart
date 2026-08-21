@@ -524,29 +524,11 @@ class _ChatScreenState extends State<ChatScreen> {
             // ── The floating glass input bar ──
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
+              child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _neonCyan.withValues(alpha: 0.06),
-                        blurRadius: 20,
-                        spreadRadius: 0,
-                        offset: const Offset(0, -2),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    color: _glassBg,
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: _glassBorder),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   child: Row(
@@ -572,13 +554,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: TextField(
                           controller: _messageController,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 15,
                           ),
                           decoration: InputDecoration(
                             hintText: 'Type a message...',
                             hintStyle: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: AppColors.textMuted,
                               fontSize: 15,
                             ),
                             border: InputBorder.none,
@@ -611,18 +593,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                   gradient: const LinearGradient(
                                     colors: [_neonCyan, _neonBlue],
                                   ),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: _neonCyan.withValues(alpha: 0.35),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                    ),
-                                  ],
+                                  borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: const Icon(
                                   Icons.send_rounded,
-                                  color: _bgDark,
+                                  color: Colors.white,
                                   size: 20,
                                 ),
                               ),
@@ -630,7 +605,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ),
                 ),
-              ),
             ),
           ],
         ),
