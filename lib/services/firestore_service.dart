@@ -215,6 +215,8 @@ class FirestoreService {
     required bool isGroup,
     required String senderId,
     required String senderName,
+    String? mediaUrl,
+    String? mediaType,
   }) async {
     // Determine the other participant's ID for direct chats
     String? otherUserId;
@@ -224,8 +226,8 @@ class FirestoreService {
         otherUserId = parts[0] == senderId ? parts[1] : parts[0];
       }
     }
-    String? imageUrl;
-    if (chatImageBytes != null) {
+    String? imageUrl = mediaUrl;
+    if (chatImageBytes != null && mediaUrl == null) {
       final timestampStr = DateTime.now().millisecondsSinceEpoch.toString();
       imageUrl = await _storage.uploadImage(
         fileBytes: chatImageBytes,
@@ -242,9 +244,10 @@ class FirestoreService {
       'senderName': senderName,
       'text': text,
       'imageUrl': imageUrl,
+      'url': mediaUrl ?? imageUrl,
       'timestamp': FieldValue.serverTimestamp(),
       'isRead': false,
-      'type': imageUrl != null ? 'image' : 'text',
+      'type': mediaType ?? (imageUrl != null ? 'image' : 'text'),
     });
     // Increment unread count for recipient in direct chats
     if (!isGroup && otherUserId != null) {

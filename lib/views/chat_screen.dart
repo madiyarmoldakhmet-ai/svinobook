@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/chat_message_model.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
+import '../services/media_service.dart';
 import '../widgets/chat_bubble.dart';
 import '../utils/image_picker_helper.dart';
 import '../utils/app_theme.dart';
@@ -32,6 +33,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Uint8List? _selectedImageBytes;
   bool _isSending = false;
   bool _isTypingStatus = false;
+  PickedMedia? _selectedMedia;
+  final MediaService _mediaService = MediaService();
 
   @override
   void initState() {
@@ -89,6 +92,17 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _pickMedia({required bool video, ImageSource source = ImageSource.gallery}) async {
+    try {
+      final media = video
+          ? await _mediaService.pickVideo(source: source)
+          : await _mediaService.pickImage(source: source);
+      if (media != null && mounted) setState(() => _selectedMedia = media);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Media selection failed: $e')));
+    }
+  }
+
   void _removeSelectedImage() {
     setState(() {
       _selectedImageBytes = null;
@@ -97,7 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty && _selectedImageBytes == null) return;
+    if (text.isEmpty && _selectedImageBytes == null && _selectedMedia == null) return;
 
     setState(() => _isSending = true);
     final firestore = context.read<FirestoreService>();
@@ -108,6 +122,10 @@ class _ChatScreenState extends State<ChatScreen> {
         'User';
 
     try {
+      String? mediaUrl;
+      if (_selectedMedia != null) {
+        mediaUrl = await _mediaService.upload(_selectedMedia!, widget.chatId, senderId);
+      }
       await firestore.sendMessage(
         chatRoomId: widget.chatId,
         text: text,
@@ -115,9 +133,12 @@ class _ChatScreenState extends State<ChatScreen> {
         isGroup: false,
         senderId: senderId,
         senderName: senderName,
+        mediaUrl: mediaUrl,
+        mediaType: _selectedMedia?.type,
       );
       _messageController.clear();
       _removeSelectedImage();
+      if (mounted) setState(() => _selectedMedia = null);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -129,11 +150,19 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void _startCall() {
+  void _startCall({required bool video}) {
+    final parts = widget.chatId.split('_');
+    final currentId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final targetId = parts.length == 2 ? (parts[0] == currentId ? parts[1] : parts[0]) : '';
+    if (targetId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('This chat has no call recipient yet')));
+      return;
+    }
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => CallScreen(
-        channelId: widget.chatId,
+        targetUserId: targetId,
         chatName: widget.chatName,
+        video: video,
       ),
     ));
   }
@@ -296,7 +325,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   child: const Icon(Icons.phone, color: _neonCyan, size: 20),
                 ),
-                onPressed: _startCall,
+                onPressed: () => _startCall(video: false),
+              ),
+              IconButton(
+                tooltip: 'Video call',
+                icon: const Icon(Icons.videocam, color: Colors.white),
+                onPressed: () => _startCall(video: true),
               ),
             ],
       ),
