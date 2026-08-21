@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
-import 'services/system_health_service.dart';
 import 'views/auth_screen.dart';
 import 'views/home_screen.dart';
 import 'utils/app_theme.dart';

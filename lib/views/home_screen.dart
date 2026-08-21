@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'project_showcase_view.dart';
 import 'global_chat_tab.dart';
 import 'direct_messages_tab.dart';
@@ -20,8 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late final SystemHealthService _systemHealthService;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!mounted) return;
     final firestore = context.read<FirestoreService>();
     _systemHealthService = SystemHealthService(firestore);
     _systemHealthService.start();
