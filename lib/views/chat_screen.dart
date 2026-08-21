@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,13 +10,12 @@ import '../widgets/chat_bubble.dart';
 import '../utils/image_picker_helper.dart';
 import 'call_screen.dart';
 
-// ── Antigravity Design Tokens ──
-const _bgDark = Color(0xFF0B0E14);
-const _bgMid = Color(0xFF1A1F2C);
-const _neonCyan = Color(0xFF00E5FF);
-const _neonBlue = Color(0xFF448AFF);
-const _glassBg = Color(0x12FFFFFF); // ~7% white
-const _glassBorder = Color(0x26FFFFFF); // ~15% white
+const _bgDark = Color(0xFFE7EEF5);
+const _bgMid = Color(0xFFFFFFFF);
+const _neonCyan = Color(0xFF4A76A8);
+const _neonBlue = Color(0xFF527DA8);
+const _glassBg = Color(0xFFFFFFFF);
+const _glassBorder = Color(0xFFC7D5E0);
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -140,8 +138,7 @@ class _ChatScreenState extends State<ChatScreen> {
     ));
   }
 
-  // ═══════════════════════════════════════════════════════
-  //  BUILD — Antigravity Glassmorphic Chat Layout
+  //  BUILD — compact personal chat layout
   // ═══════════════════════════════════════════════════════
   @override
   Widget build(BuildContext context) {
@@ -152,14 +149,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: _bgDark,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [_bgDark, _bgMid, _bgDark],
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
+        color: _bgDark,
         child: Column(
           children: [
             // ── Custom Antigravity Header (SafeArea-safe) ──
@@ -191,7 +181,7 @@ class _ChatScreenState extends State<ChatScreen> {
         bottom: 12,
       ),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.4),
+        color: _neonCyan,
         border: Border(
           bottom: BorderSide(
             color: _neonCyan.withValues(alpha: 0.15),
@@ -199,10 +189,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
       ),
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Row(
+      child: Row(
             children: [
               // Back button — always visible and clickable
               IconButton(
@@ -312,8 +299,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 onPressed: _startCall,
               ),
             ],
-          ),
-        ),
       ),
     );
   }
