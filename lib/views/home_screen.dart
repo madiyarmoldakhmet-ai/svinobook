@@ -4,6 +4,8 @@ import 'project_showcase_view.dart';
 import 'global_chat_tab.dart';
 import 'direct_messages_tab.dart';
 import 'profile_tab.dart';
+import '../services/firestore_service.dart';
+import '../services/system_health_service.dart';
 import '../utils/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,6 +17,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  late final SystemHealthService _systemHealthService;
+
+  @override
+  void initState() {
+    super.initState();
+    final firestore = context.read<FirestoreService>();
+    _systemHealthService = SystemHealthService(firestore);
+    _systemHealthService.start();
+  }
+
+  @override
+  void dispose() {
+    _systemHealthService.stop();
+    super.dispose();
+  }
 
   final List<Widget> _tabs = const [
     ProjectShowcaseView(),

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import '../models/task_card_model.dart';
+import '../services/firestore_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/task_card.dart';
 
 class ProjectShowcaseView extends StatefulWidget {
   const ProjectShowcaseView({super.key});
@@ -272,173 +275,191 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                   }
 
                   final docs = snapshot.data?.docs ?? [];
-                  if (docs.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.auto_awesome,
-                              size: 64,
-                              color: AppColors.neonCyan.withValues(alpha: 0.3)),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Nothing here yet',
-                            style: TextStyle(
-                                color: AppColors.textMuted, fontSize: 16),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Be the first to share!',
-                            style: TextStyle(
-                                color: AppColors.neonCyan
-                                    .withValues(alpha: 0.6),
-                                fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                  final firestore = context.read<FirestoreService>();
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
-                    itemCount: docs.length,
-                    itemBuilder: (context, index) {
-                      final doc = docs[index];
-                      final data = doc.data() as Map<String, dynamic>;
-                      final title = data['title'] ?? 'Untitled';
-                      final desc = data['description'] ?? '';
-                      final imageUrl = data['imageUrl'] as String?;
-                      final userName = data['userName'] ?? 'Unknown';
-                      final userPhotoUrl = data['userPhotoUrl'] as String?;
-                      final likes = data['likes'] ?? 0;
-                      final timestamp =
-                          (data['createdAt'] as Timestamp?)?.toDate() ??
-                              DateTime.now();
+                  return StreamBuilder<List<TaskCardModel>>(
+                    stream: firestore.getTasksStream(),
+                    builder: (context, taskSnapshot) {
+                      final tasks = taskSnapshot.data ?? [];
 
-                      return GlassCard(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        borderRadius: 20,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Row(
-                                children: [
-                                  GradientAvatar(
-                                    name: userName,
-                                    radius: 20,
-                                    backgroundImage: (userPhotoUrl != null &&
-                                            userPhotoUrl.isNotEmpty)
-                                        ? NetworkImage(userPhotoUrl)
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          userName,
-                                          style: const TextStyle(
-                                            color: AppColors.textPrimary,
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                        Text(
-                                          DateFormat.yMMMd()
-                                              .add_jm()
-                                              .format(timestamp),
-                                          style: TextStyle(
-                                              color: AppColors.textMuted,
-                                              fontSize: 12),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                      if (docs.isEmpty && tasks.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.auto_awesome,
+                                  size: 64,
+                                  color: AppColors.neonCyan.withValues(alpha: 0.3)),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Nothing here yet',
+                                style: TextStyle(
+                                    color: AppColors.textMuted, fontSize: 16),
                               ),
-                            ),
-                            if (imageUrl != null && imageUrl.isNotEmpty)
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                    bottom: Radius.circular(0)),
-                                child: Image.network(
-                                  imageUrl,
-                                  width: double.infinity,
-                                  height: 220,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (c, e, s) => Container(
-                                    height: 200,
-                                    color: AppColors.glassBg,
-                                    child: const Center(
-                                      child: CircularProgressIndicator(
-                                          color: AppColors.neonCyan),
-                                    ),
-                                  ),
-                                  errorBuilder: (c, e, s) => Container(
-                                    height: 120,
-                                    color: AppColors.glassBg,
-                                    child: const Center(
-                                        child: Icon(Icons.broken_image,
-                                            color: AppColors.textMuted)),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Be the first to share!',
+                                style: TextStyle(
+                                    color: AppColors.neonCyan
+                                        .withValues(alpha: 0.6),
+                                    fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      final combined = <Widget>[];
+
+                      for (final doc in docs) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final title = data['title'] ?? 'Untitled';
+                        final desc = data['description'] ?? '';
+                        final imageUrl = data['imageUrl'] as String?;
+                        final userName = data['userName'] ?? 'Unknown';
+                        final userPhotoUrl = data['userPhotoUrl'] as String?;
+                        final likes = data['likes'] ?? 0;
+                        final timestamp =
+                            (data['createdAt'] as Timestamp?)?.toDate() ??
+                                DateTime.now();
+
+                        combined.add(
+                          GlassCard(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            borderRadius: 20,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: Row(
+                                    children: [
+                                      GradientAvatar(
+                                        name: userName,
+                                        radius: 20,
+                                        backgroundImage: (userPhotoUrl != null &&
+                                                userPhotoUrl.isNotEmpty)
+                                            ? NetworkImage(userPhotoUrl)
+                                            : null,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              userName,
+                                              style: const TextStyle(
+                                                color: AppColors.textPrimary,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                            Text(
+                                              DateFormat.yMMMd()
+                                                  .add_jm()
+                                                  .format(timestamp),
+                                              style: TextStyle(
+                                                  color: AppColors.textMuted,
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    title,
-                                    style: const TextStyle(
-                                      color: AppColors.textPrimary,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
+                                if (imageUrl != null && imageUrl.isNotEmpty)
+                                  ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                        bottom: Radius.circular(0)),
+                                    child: Image.network(
+                                      imageUrl,
+                                      width: double.infinity,
+                                      height: 220,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (c, e, s) => Container(
+                                        height: 200,
+                                        color: AppColors.glassBg,
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                              color: AppColors.neonCyan),
+                                        ),
+                                      ),
+                                      errorBuilder: (c, e, s) => Container(
+                                        height: 120,
+                                        color: AppColors.glassBg,
+                                        child: const Center(
+                                            child: Icon(Icons.broken_image,
+                                                color: AppColors.textMuted)),
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    desc,
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 14,
-                                      height: 1.5,
-                                    ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        title,
+                                        style: const TextStyle(
+                                          color: AppColors.textPrimary,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        desc,
+                                        style: const TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 14,
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                Divider(
+                                    color: AppColors.glassBorder, height: 1),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.local_fire_department,
+                                            color: AppColors.neonCyan
+                                                .withValues(alpha: 0.8)),
+                                        onPressed: () => _supportProject(
+                                            doc.id, likes),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '$likes Support',
+                                        style: const TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            Divider(
-                                color: AppColors.glassBorder, height: 1),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.local_fire_department,
-                                        color: AppColors.neonCyan
-                                            .withValues(alpha: 0.8)),
-                                    onPressed: () => _supportProject(
-                                        doc.id, likes),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '$likes Support',
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        );
+                      }
+
+                      for (final task in tasks) {
+                        combined.add(TaskCard(task: task));
+                      }
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+                        itemCount: combined.length,
+                        itemBuilder: (context, index) => combined[index],
                       );
                     },
                   );
