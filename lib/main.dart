@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
+import 'services/security_alert_service.dart';
 import 'views/auth_screen.dart';
 import 'views/home_screen.dart';
 import 'utils/app_theme.dart';
@@ -14,6 +15,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  SecurityAlertService().startAlertListener();
 
   runApp(
     MultiProvider(

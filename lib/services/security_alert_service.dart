@@ -1,80 +1,106 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../models/security_alert_model.dart';
 
 class SecurityAlertService {
-  static const List<String> supportedTypes = ['DDoS_Check', 'Port_Scan'];
-  static const List<String> supportedStatuses = ['WARNING', 'CRITICAL'];
+  static const List<String> supportedTypes = ['DDoS_Check', 'Port_Scan', 'port_scan_detected', 'unauthorized_port'];
+  static const List<String> supportedSeverities = ['low', 'medium', 'high', 'critical'];
 
-  static SecurityAlertModel? fromPayload(Map<String, dynamic> payload) {
-    final source = (payload['source'] ?? '').toString().trim();
-    final type = (payload['type'] ?? '').toString().trim();
-    final status = (payload['status'] ?? '').toString().trim();
-    final details = (payload['details'] ?? '').toString().trim();
+  HttpServer? _server;
 
-    if (source.isEmpty || details.isEmpty) return null;
-    if (!supportedTypes.contains(type)) return null;
-    if (!supportedStatuses.contains(status)) return null;
-
-    return SecurityAlertModel(
-      source: source,
-      type: type,
-      status: status,
-      details: details,
-      createdAt: DateTime.now(),
-    );
-  }
-
-  static Future<SecurityAlertModel?> handleIncomingJson(String body) async {
-    try {
-      final decoded = jsonDecode(body);
-      if (decoded is! Map<String, dynamic>) {
-        return null;
-      }
-      return fromPayload(decoded);
-    } catch (_) {
-      return null;
+  Future<void> startAlertListener({int port = 8080}) async {
+    if (_server != null) {
+      return;
     }
-  }
 
-  static Future<HttpServer> createLocalListener({
-    required int port,
-    required Future<void> Function(SecurityAlertModel alert) onAlert,
-  }) async {
-    final server = await HttpServer.bind(
-      InternetAddress.loopbackIPv4,
-      port,
-      shared: true,
-    );
+    _server = await HttpServer.bind(InternetAddress.anyIPv4, port, shared: true);
 
-    server.listen((request) async {
-      if (request.method != 'POST') {
-        request.response.statusCode = 405;
-        request.response.write('Only POST is supported');
-        await request.response.close();
-        return;
-      }
-
+    _server!.listen((request) async {
       try {
-        final body = await utf8.decoder.bind(request).join();
-        final alert = await handleIncomingJson(body);
-        if (alert != null) {
-          await onAlert(alert);
-          request.response.statusCode = 200;
-          request.response.write(jsonEncode({'status': 'accepted'}));
-        } else {
-          request.response.statusCode = 400;
-          request.response.write(jsonEncode({'status': 'rejected', 'reason': 'invalid-payload'}));
+        if (request.method != 'POST') {
+          request.response.statusCode = HttpStatus.methodNotAllowed;
+          request.response.write(jsonEncode({'status': 'error', 'message': 'Only POST is allowed'}));
+          await request.response.close();
+          return;
         }
+
+        final body = await utf8.decodeStream(request);
+        final decoded = jsonDecode(body);
+
+        if (decoded is! Map<String, dynamic>) {
+          request.response.statusCode = HttpStatus.badRequest;
+          request.response.write(jsonEncode({'status': 'error', 'message': 'JSON object required'}));
+          await request.response.close();
+          return;
+        }
+
+        final alert = fromPayload(decoded);
+        if (alert == null) {
+          request.response.statusCode = HttpStatus.badRequest;
+          request.response.write(jsonEncode({'status': 'error', 'message': 'Invalid alert payload'}));
+          await request.response.close();
+          return;
+        }
+
+        await FirebaseFirestore.instance.collection('security_alerts').add({
+          'title': alert.title,
+          'description': alert.description,
+          'severity': alert.severity,
+          'source': alert.source ?? 'External',
+          'type': alert.type ?? 'port_scan_detected',
+          'createdAt': FieldValue.serverTimestamp(),
+          'rawPayload': decoded,
+        });
+
+        request.response.statusCode = HttpStatus.ok;
+        request.response.write(jsonEncode({'status': 'accepted'}));
       } catch (_) {
-        request.response.statusCode = 500;
-        request.response.write(jsonEncode({'status': 'error'}));
+        request.response.statusCode = HttpStatus.badRequest;
+        request.response.write(jsonEncode({'status': 'error', 'message': 'Bad request'}));
       } finally {
         await request.response.close();
       }
+    }, onError: (error) {
+      // no-op; request handling errors are already captured per request
     });
+  }
 
-    return server;
+  Future<void> stopServer() async {
+    await _server?.close(force: true);
+    _server = null;
+  }
+
+  SecurityAlertModel? fromPayload(Map<String, dynamic> payload) {
+    final title = (payload['title'] ?? payload['source'] ?? 'Security Alert').toString().trim();
+    final description = (payload['description'] ?? payload['details'] ?? '').toString().trim();
+    final severity = (payload['severity'] ?? payload['status'] ?? 'medium').toString().trim().toLowerCase();
+    final source = (payload['source'] ?? 'External').toString().trim();
+    final type = (payload['type'] ?? 'port_scan_detected').toString().trim();
+
+    if (title.isEmpty || description.isEmpty) {
+      return null;
+    }
+
+    if (!supportedSeverities.contains(severity)) {
+      return null;
+    }
+
+    final normalizedType = type;
+    if (!supportedTypes.contains(normalizedType) &&
+        !['port_scan_detected', 'unauthorized_port'].contains(normalizedType)) {
+      return null;
+    }
+
+    return SecurityAlertModel(
+      title: title,
+      description: description,
+      severity: severity,
+      source: source,
+      type: normalizedType,
+      createdAt: DateTime.now(),
+    );
   }
 }
