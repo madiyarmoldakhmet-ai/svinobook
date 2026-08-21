@@ -87,7 +87,6 @@ class ChatBubble extends StatelessWidget {
                 blurRadius: 2,
                 offset: const Offset(0, 1),
               ),
-            ),
           ],
         ),
         child: ClipRRect(
