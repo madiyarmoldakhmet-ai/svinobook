@@ -130,37 +130,16 @@ class ChatBubble extends StatelessWidget {
                         height: 200,
                         width: 200,
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: 150,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.neonCyan,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 150,
-                            width: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: Icon(Icons.broken_image,
-                                  color: AppColors.textMuted),
-                            ),
-                          );
-                        },
+                        placeholder: (context, url) => const SizedBox(
+                          height: 150,
+                          width: 200,
+                          child: Center(child: CircularProgressIndicator(color: AppColors.neonCyan, strokeWidth: 2)),
+                        ),
+                        errorWidget: (context, url, error) => const SizedBox(
+                          height: 150,
+                          width: 200,
+                          child: Center(child: Icon(Icons.broken_image, color: AppColors.textMuted)),
+                        ),
                       ),
                     ),
                     if (text.isNotEmpty && type != 'image')
