@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -39,7 +40,7 @@ class SecurityAlertService {
     }
   }
 
-  static Future<http.Response> createLocalListener({
+  static Future<HttpServer> createLocalListener({
     required int port,
     required Future<void> Function(SecurityAlertModel alert) onAlert,
   }) async {
@@ -76,10 +77,6 @@ class SecurityAlertService {
       }
     });
 
-    return http.Response(
-      'accepted',
-      200,
-      headers: {'Content-Type': 'application/json'},
-    );
+    return server;
   }
 }
