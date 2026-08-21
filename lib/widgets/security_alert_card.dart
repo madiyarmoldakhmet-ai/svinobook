@@ -8,7 +8,7 @@ class SecurityAlertCard extends StatelessWidget {
   final SecurityAlertModel alert;
   const SecurityAlertCard({super.key, required this.alert});
 
-  bool get isCritical => alert.status.toUpperCase() == 'CRITICAL';
+  bool get isCritical => alert.severity.toLowerCase() == 'critical';
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class SecurityAlertCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      alert.type,
+                      alert.title,
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.w800,
@@ -58,7 +58,7 @@ class SecurityAlertCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${alert.source} • ${alert.status}',
+                      '${alert.source ?? 'Security'} • ${alert.severity.toUpperCase()}',
                       style: TextStyle(
                         color: accent,
                         fontWeight: FontWeight.w600,
@@ -72,7 +72,7 @@ class SecurityAlertCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            alert.details,
+            alert.description,
             style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14,

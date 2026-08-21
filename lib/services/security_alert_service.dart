@@ -6,8 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/security_alert_model.dart';
 
 class SecurityAlertService {
-  static const List<String> supportedTypes = ['DDoS_Check', 'Port_Scan', 'port_scan_detected', 'unauthorized_port'];
-  static const List<String> supportedSeverities = ['low', 'medium', 'high', 'critical'];
+  static const List<String> supportedTypes = ['DDoS_Check', 'Port_Scan', 'port_scan_detected', 'unauthorized_port', 'security_alert'];
+  static const List<String> supportedSeverities = ['low', 'medium', 'high', 'critical', 'warning'];
 
   HttpServer? _server;
 

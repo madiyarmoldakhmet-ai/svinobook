@@ -165,13 +165,13 @@ class FirestoreService {
     await _db.collection('global_chat').add({
       'senderId': 'security_agent',
       'senderName': 'Security Agent',
-      'text': '${alert.type} • ${alert.status}\n${alert.details}',
+      'text': '${alert.title}\n${alert.description}',
       'timestamp': FieldValue.serverTimestamp(),
       'type': 'security_alert',
-      'alertType': alert.type,
-      'alertStatus': alert.status,
-      'alertDetails': alert.details,
-      'alertSource': alert.source,
+      'alertType': alert.type ?? 'security_alert',
+      'alertStatus': alert.severity,
+      'alertDetails': alert.description,
+      'alertSource': alert.source ?? 'Security Agent',
     });
   }
 
