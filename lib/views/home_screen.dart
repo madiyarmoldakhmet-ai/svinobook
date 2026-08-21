@@ -49,22 +49,159 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgDarkest,
-      body: Stack(
-        children: [
-          // Tab content
-          IndexedStack(index: _currentIndex, children: _tabs),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= 760;
+          return Column(
+            children: [
+              const _ClassicTopBar(),
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1080),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (isDesktop)
+                          _ClassicSidebar(
+                            currentIndex: _currentIndex,
+                            onTap: (index) => setState(() => _currentIndex = index),
+                          ),
+                        Expanded(
+                          child: IndexedStack(index: _currentIndex, children: _tabs),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (!isDesktop)
+                _GlassNavBar(
+                  currentIndex: _currentIndex,
+                  onTap: (index) => setState(() => _currentIndex = index),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
 
-          // Glassmorphic navigation bar
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 16,
-            child: _GlassNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) => setState(() => _currentIndex = index),
-            ),
+class _ClassicTopBar extends StatelessWidget {
+  const _ClassicTopBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 44,
+      color: AppColors.neonCyan,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1080),
+          child: Row(
+            children: [
+              const SizedBox(width: 14),
+              const Text(
+                'svinobook',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 24),
+              SizedBox(
+                width: 230,
+                height: 28,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search',
+                    hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
+                    prefixIcon: const Icon(Icons.search, color: Colors.white, size: 17),
+                    filled: true,
+                    fillColor: Colors.black.withValues(alpha: 0.12),
+                    contentPadding: EdgeInsets.zero,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(3),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ),
+              const Spacer(),
+              const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+              const SizedBox(width: 14),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ClassicSidebar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const _ClassicSidebar({required this.currentIndex, required this.onTap});
+
+  static const items = [
+    _NavItem(icon: Icons.person_outline, label: 'My page'),
+    _NavItem(icon: Icons.public, label: 'News'),
+    _NavItem(icon: Icons.forum_outlined, label: 'Messages'),
+    _NavItem(icon: Icons.check_box_outlined, label: 'Tasks'),
+    _NavItem(icon: Icons.shield_outlined, label: 'Security'),
+    _NavItem(icon: Icons.people_outline, label: 'Profile'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 174,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 14, 10, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ...List.generate(items.length, (index) {
+              final item = items[index];
+              final selected = index == currentIndex;
+              return InkWell(
+                onTap: () => onTap(index),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  color: selected ? const Color(0xFFDCE8F3) : Colors.transparent,
+                  child: Row(
+                    children: [
+                      Icon(item.icon, size: 17, color: AppColors.neonCyan),
+                      const SizedBox(width: 9),
+                      Text(
+                        item.label,
+                        style: TextStyle(
+                          color: selected ? AppColors.textPrimary : AppColors.neonCyan,
+                          fontSize: 13,
+                          fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            const Divider(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('COMMUNITY', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
+            ),
+            const SizedBox(height: 8),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('Help  •  Settings', style: TextStyle(color: AppColors.neonCyan, fontSize: 12)),
+            ),
+          ],
+        ),
       ),
     );
   }
