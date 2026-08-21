@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +8,6 @@ import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../services/media_service.dart';
 import '../widgets/chat_bubble.dart';
-import '../utils/image_picker_helper.dart';
 import '../utils/app_theme.dart';
 import 'call_screen.dart';
 
@@ -31,7 +29,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  Uint8List? _selectedImageBytes;
   bool _isSending = false;
   bool _isTypingStatus = false;
   PickedMedia? _selectedMedia;
@@ -95,15 +92,9 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void _removeSelectedImage() {
-    setState(() {
-      _selectedImageBytes = null;
-    });
-  }
-
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty && _selectedImageBytes == null && _selectedMedia == null) return;
+    if (text.isEmpty && _selectedMedia == null) return;
 
     setState(() => _isSending = true);
     final firestore = context.read<FirestoreService>();
@@ -121,7 +112,6 @@ class _ChatScreenState extends State<ChatScreen> {
       await firestore.sendMessage(
         chatRoomId: widget.chatId,
         text: text,
-        chatImageBytes: _selectedImageBytes,
         isGroup: false,
         senderId: senderId,
         senderName: senderName,
@@ -129,7 +119,6 @@ class _ChatScreenState extends State<ChatScreen> {
         mediaType: _selectedMedia?.type,
       );
       _messageController.clear();
-      _removeSelectedImage();
       if (mounted) setState(() => _selectedMedia = null);
     } catch (e) {
       if (mounted) {
@@ -505,48 +494,6 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Image preview
-            if (_selectedImageBytes != null)
-              Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _glassBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _glassBorder, width: 1),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.memory(
-                        _selectedImageBytes!,
-                        height: 60,
-                        width: 60,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: _removeSelectedImage,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.red.withValues(alpha: 0.4),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Icon(Icons.close, color: Colors.red, size: 16),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
             // ── The floating glass input bar ──
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
