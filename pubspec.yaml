@@ -18,6 +18,7 @@ dependencies:
   firebase_storage: ^13.4.1
   provider: ^6.1.5+1
   intl: ^0.20.2
+  http: ^1.2.2
   image_picker: ^1.2.2
   agora_rtc_engine: ^6.6.3
   google_fonts: ^6.2.1

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -10,6 +9,18 @@ class AiAgentService {
     r'(?:create|add|new)\s+(?:a\s+)?(?:task|todo|reminder)|\b(?:task|todo|reminder|follow up|follow-up)\b',
     caseSensitive: false,
   );
+
+  static Future<TaskCardModel?> parseTaskFromTextAsync(String text) async {
+    final aiResult = await callLocalQwen(
+      prompt: text,
+    );
+
+    if (aiResult['ok'] == true && aiResult['task'] is TaskCardModel) {
+      return aiResult['task'] as TaskCardModel;
+    }
+
+    return extractTaskFromText(text);
+  }
 
   static TaskCardModel? extractTaskFromText(String text) {
     final normalized = text.trim();
@@ -153,6 +164,14 @@ class AiAgentService {
       try {
         final response = await _postJson(candidate, prompt);
         if (response['ok'] == true) {
+          final parsedTask = _taskFromAiText(response['text']?.toString() ?? '');
+          if (parsedTask != null) {
+            return {
+              'ok': true,
+              'text': response['text'],
+              'task': parsedTask,
+            };
+          }
           return response;
         }
       } catch (_) {
@@ -166,6 +185,28 @@ class AiAgentService {
       'message': 'Local AI endpoint unavailable; using regex fallback.',
       'task': extractTaskFromText(prompt),
     };
+  }
+
+  static TaskCardModel? _taskFromAiText(String text) {
+    final task = extractTaskFromText(text);
+    if (task != null) {
+      return task;
+    }
+    final cleaned = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (cleaned.isEmpty) return null;
+
+    final title = cleaned.length > 80 ? '${cleaned.substring(0, 77).trim()}...' : cleaned;
+    return TaskCardModel(
+      id: 'ai_generated',
+      title: title,
+      description: cleaned,
+      priority: 'Medium',
+      status: 'open',
+      assigneeName: 'AI Assistant',
+      createdAt: DateTime.now(),
+      sourceType: 'ai',
+      metadata: {'rawText': cleaned, 'source': 'qwen-local-engine'},
+    );
   }
 
   static Future<Map<String, dynamic>> _postJson(String endpoint, String prompt) async {

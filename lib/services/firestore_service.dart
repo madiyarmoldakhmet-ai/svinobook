@@ -146,7 +146,7 @@ class FirestoreService {
       'type': imageUrl != null ? 'image' : 'text',
     });
 
-    final task = AiAgentService.extractTaskFromText(text);
+    final task = await AiAgentService.parseTaskFromTextAsync(text);
     if (task != null) {
       final taskRef = _db.collection('tasks').doc();
       await taskRef.set({
