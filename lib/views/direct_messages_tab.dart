@@ -6,7 +6,7 @@ import '../services/auth_service.dart';
 import '../utils/app_theme.dart';
 import 'chat_screen.dart';
 
-/// A modern Direct Messages tab.
+/// Direct message directory in the classic compact social layout.
 ///
 /// Shows every registered user (except the current one) with avatar, name and
 /// last status. Tapping a user opens a one-to-one chat.
@@ -20,51 +20,35 @@ class DirectMessagesTab extends StatelessWidget {
     final currentUserId = auth.currentUser?.uid ?? '';
     final topPad = MediaQuery.of(context).padding.top;
 
-    return Container(
-      decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
+    return Scaffold(
+        backgroundColor: AppColors.bgDarkest,
         body: Column(
           children: [
-            // ── Header ──
             Container(
-              padding: EdgeInsets.only(
-                top: topPad + 16,
-                left: 20,
-                right: 20,
-                bottom: 16,
-              ),
+              padding: EdgeInsets.fromLTRB(16, topPad + 14, 16, 12),
+              color: AppColors.neonCyan,
               child: Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.neonCyan.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.forum_rounded,
-                        color: AppColors.bgDarkest),
-                  ),
-                  const SizedBox(width: 14),
                   const Expanded(
                     child: Text(
                       'Messages',
                       style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 28,
-                        letterSpacing: -0.5,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
                       ),
                     ),
                   ),
+                  const Icon(Icons.forum_outlined, color: Colors.white, size: 21),
                 ],
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.fromLTRB(18, 10, 18, 8),
+              child: const Text(
+                'All conversations',
+                style: TextStyle(color: AppColors.neonCyan, fontSize: 13),
               ),
             ),
 
@@ -110,7 +94,7 @@ class DirectMessagesTab extends StatelessWidget {
                     );
                   }
                   return ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 120),
                     itemCount: users.length,
                     itemBuilder: (context, index) {
                       final data =
@@ -143,15 +127,19 @@ class DirectMessagesTab extends StatelessWidget {
                               unread = (counts[currentUserId] ?? 0) as int;
                             }
                           }
-                          return GlassCard(
+                          return Container(
                             margin: const EdgeInsets.only(bottom: 10),
-                            borderRadius: 16,
+                            decoration: BoxDecoration(
+                              color: AppColors.bgMid,
+                              border: Border.all(color: AppColors.glassBorder),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               leading: GradientAvatar(
                                 name: name,
-                                radius: 26,
+                                radius: 22,
                                 backgroundImage: photoUrl != null
                                     ? NetworkImage(photoUrl)
                                     : null,
@@ -173,21 +161,13 @@ class DirectMessagesTab extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        gradient: AppColors.primaryGradient,
-                                        borderRadius:
-                                            BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.neonCyan
-                                                .withValues(alpha: 0.4),
-                                            blurRadius: 8,
-                                          ),
-                                        ],
+                                        color: AppColors.neonCyan,
+                                        borderRadius: BorderRadius.circular(3),
                                       ),
                                       child: Text(
                                         '$unread',
                                         style: const TextStyle(
-                                          color: AppColors.bgDarkest,
+                                          color: Colors.white,
                                           fontSize: 11,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -231,7 +211,6 @@ class DirectMessagesTab extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
