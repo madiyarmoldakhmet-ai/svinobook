@@ -179,7 +179,6 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }
