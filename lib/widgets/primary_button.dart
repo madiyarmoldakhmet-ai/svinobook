@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
 
-/// A modern gradient primary button with glow effect.
+/// A compact primary action button.
 class PrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -25,20 +25,12 @@ class PrimaryButton extends StatelessWidget {
         onTap: isDisabled ? null : onPressed,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: 54,
+          height: 42,
           decoration: BoxDecoration(
             gradient: isDisabled ? null : AppColors.primaryGradient,
             color: isDisabled ? AppColors.bgLight : null,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: isDisabled
-                ? null
-                : [
-                    BoxShadow(
-                      color: AppColors.neonCyan.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+            borderRadius: BorderRadius.circular(3),
+            border: Border.all(color: AppColors.glassBorder),
           ),
           child: Center(
             child: isLoading
@@ -46,7 +38,7 @@ class PrimaryButton extends StatelessWidget {
                     height: 22,
                     width: 22,
                     child: CircularProgressIndicator(
-                      color: AppColors.bgDarkest,
+                      color: Colors.white,
                       strokeWidth: 2.5,
                     ),
                   )
@@ -54,15 +46,15 @@ class PrimaryButton extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, color: AppColors.bgDarkest, size: 20),
+                        Icon(icon, color: Colors.white, size: 18),
                         const SizedBox(width: 8),
                       ],
                       Text(
                         text,
                         style: const TextStyle(
-                          color: AppColors.bgDarkest,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],

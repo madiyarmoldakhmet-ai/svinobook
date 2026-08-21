@@ -11,14 +11,14 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      borderRadius: 18,
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      borderRadius: 4,
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.2),
-          blurRadius: 12,
-          offset: const Offset(0, 4),
+          color: Colors.black.withValues(alpha: 0.08),
+          blurRadius: 2,
+          offset: const Offset(0, 1),
         ),
       ],
       child: Column(
@@ -71,7 +71,7 @@ class PostCard extends StatelessWidget {
           if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
             const SizedBox(height: 14),
             ClipRRect(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(3),
               child: Image.network(
                 post.imageUrl!,
                 width: double.infinity,
@@ -82,7 +82,7 @@ class PostCard extends StatelessWidget {
                     height: 200,
                     decoration: BoxDecoration(
                       color: AppColors.glassBg,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                     child: const Center(
                       child: CircularProgressIndicator(
@@ -97,7 +97,7 @@ class PostCard extends StatelessWidget {
                     height: 200,
                     decoration: BoxDecoration(
                       color: AppColors.glassBg,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                     child: const Center(
                       child: Icon(Icons.broken_image,
@@ -113,7 +113,7 @@ class PostCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: AppColors.neonCyan.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(3),
               border: Border.all(
                 color: AppColors.neonCyan.withValues(alpha: 0.2),
                 width: 1,

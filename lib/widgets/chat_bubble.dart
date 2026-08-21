@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../utils/app_theme.dart';
@@ -54,7 +53,7 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-  BorderRadius _radiusFor(bool isMe) => BorderRadius.circular(18).copyWith(
+  BorderRadius _radiusFor(bool isMe) => BorderRadius.circular(3).copyWith(
         bottomRight:
             isMe ? const Radius.circular(4) : const Radius.circular(18),
         bottomLeft:
@@ -72,8 +71,6 @@ class ChatBubble extends StatelessWidget {
     final borderColor = isMe
         ? AppColors.neonCyan.withValues(alpha: 0.35)
         : AppColors.glassBorder;
-    final glowColor = isMe ? AppColors.neonBlue.withValues(alpha: 0.25) : Colors.transparent;
-
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -86,23 +83,16 @@ class ChatBubble extends StatelessWidget {
           boxShadow: [
             if (isMe)
               BoxShadow(
-                color: glowColor,
-                blurRadius: 16,
-                spreadRadius: 0,
-                offset: const Offset(0, 4),
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
               ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: ClipRRect(
           borderRadius: _radiusFor(isMe),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
+          child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: bgColor,
@@ -186,8 +176,6 @@ class ChatBubble extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-            ),
           ),
         ),
       ),
