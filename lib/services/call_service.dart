@@ -10,7 +10,7 @@ class CallSession {
   final RTCVideoRenderer localRenderer;
   final RTCVideoRenderer remoteRenderer;
   final StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> signaling;
-  final StreamSubscription<QuerySnapshot<Map<String, dynamic>>> candidates;
+  final StreamSubscription<DocumentSnapshot<Map<String, dynamic>>> candidates;
 
   CallSession({
     required this.callId,
@@ -45,16 +45,18 @@ class CallService {
 
   String get _uid => _auth.currentUser?.uid ?? '';
 
-  Stream<QueryDocumentSnapshot<Map<String, dynamic>>> listenForCalls() {
+  Stream<DocumentSnapshot<Map<String, dynamic>>> listenForCalls() {
     if (_uid.isEmpty) return const Stream.empty();
     return _db
         .collection('calls')
         .where('calleeId', isEqualTo: _uid)
         .where('status', isEqualTo: 'calling')
         .snapshots()
-        .expand((snapshot) => snapshot.docChanges
-            .where((change) => change.type == DocumentChangeType.added)
-            .map((change) => change.doc));
+        .asyncExpand((snapshot) async* {
+          for (final change in snapshot.docChanges) {
+            if (change.type == DocumentChangeType.added) yield change.doc;
+          }
+        });
   }
 
   Future<CallSession> makeCall(String targetUserId, {bool video = true}) async {

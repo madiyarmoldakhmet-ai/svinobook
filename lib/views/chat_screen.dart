@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/chat_message_model.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
@@ -567,7 +568,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   child: Row(
                     children: [
-                      // Attach image button
+                      // Attach media button
                       IconButton(
                         icon: Container(
                           padding: const EdgeInsets.all(6),
@@ -581,7 +582,14 @@ class _ChatScreenState extends State<ChatScreen> {
                             size: 20,
                           ),
                         ),
-                        onPressed: _pickImage,
+                        onPressed: () => showModalBottomSheet<void>(
+                          context: context,
+                          builder: (_) => SafeArea(child: Wrap(children: [
+                            ListTile(leading: const Icon(Icons.photo), title: const Text('Photo'), onTap: () { Navigator.pop(context); _pickMedia(video: false); }),
+                            ListTile(leading: const Icon(Icons.video_library), title: const Text('Video'), onTap: () { Navigator.pop(context); _pickMedia(video: true); }),
+                            ListTile(leading: const Icon(Icons.camera_alt), title: const Text('Camera'), onTap: () { Navigator.pop(context); _pickMedia(video: false, source: ImageSource.camera); }),
+                          ])),
+                        ),
                       ),
                       // Text field
                       Expanded(

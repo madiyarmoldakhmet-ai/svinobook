@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:video_player/video_player.dart';
 import '../utils/app_theme.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -62,7 +63,8 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showImage = type == 'image' || (imageUrl != null && imageUrl!.isNotEmpty);
+    final showVideo = type == 'video';
+    final showImage = !showVideo && (type == 'image' || (imageUrl != null && imageUrl!.isNotEmpty));
     final displayUrl = imageUrl ?? (type == 'image' ? text : null);
 
     final bgColor = isMe
@@ -118,7 +120,9 @@ class ChatBubble extends StatelessWidget {
                   if (showImage &&
                       displayUrl != null &&
                       displayUrl.isNotEmpty) ...[
-                    ClipRRect(
+                    if (showVideo)
+                      _VideoAttachment(url: displayUrl)
+                    else ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         displayUrl,
@@ -180,5 +184,26 @@ class ChatBubble extends StatelessWidget {
           ),
         ),
     );
+  }
+}
+
+class _VideoAttachment extends StatefulWidget {
+  final String? url;
+  const _VideoAttachment({this.url});
+  @override
+  State<_VideoAttachment> createState() => _VideoAttachmentState();
+}
+
+class _VideoAttachmentState extends State<_VideoAttachment> {
+  VideoPlayerController? _controller;
+  @override
+  void initState() { super.initState(); if (widget.url != null) { _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!))..initialize().then((_) { if (mounted) setState(() {}); }); } }
+  @override
+  void dispose() { _controller?.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return const SizedBox(width: 220, height: 160, child: Center(child: CircularProgressIndicator()));
+    return Stack(alignment: Alignment.center, children: [SizedBox(width: 220, height: 160, child: VideoPlayer(controller)), IconButton(onPressed: () => setState(() => controller.value.isPlaying ? controller.pause() : controller.play()), icon: Icon(controller.value.isPlaying ? Icons.pause_circle : Icons.play_circle, color: Colors.white, size: 48))]);
   }
 }
