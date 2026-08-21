@@ -9,6 +9,8 @@ import 'profile_tab.dart';
 import '../services/firestore_service.dart';
 import '../services/system_health_service.dart';
 import '../utils/app_theme.dart';
+import '../services/call_service.dart';
+import 'call_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +22,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final SystemHealthService _systemHealthService;
+  final CallService _callService = CallService();
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _incomingSubscription;
 
   @override
   void didChangeDependencies() {
@@ -28,11 +32,30 @@ class _HomeScreenState extends State<HomeScreen> {
     final firestore = context.read<FirestoreService>();
     _systemHealthService = SystemHealthService(firestore);
     _systemHealthService.start();
+    _incomingSubscription ??= _callService.listenForCalls().listen((call) {
+      if (!mounted) return;
+      final data = call.data();
+      if (data == null) return;
+      final callerId = data['callerId'] as String? ?? '';
+      final callerName = data['callerName'] as String? ?? 'Svinobook user';
+      final video = data['type'] != 'audio';
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => IncomingCallScreen(
+        callId: call.id,
+        callerName: callerName,
+        video: video,
+        onAccepted: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => CallScreen(callId: call.id, targetUserId: callerId, chatName: callerName, video: video)));
+        },
+      )));
+    });
   }
 
   @override
   void dispose() {
     _systemHealthService.stop();
+    _incomingSubscription?.cancel();
+    _callService.dispose();
     super.dispose();
   }
 

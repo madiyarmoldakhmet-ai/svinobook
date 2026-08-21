@@ -6,10 +6,11 @@ import '../utils/app_theme.dart';
 
 class CallScreen extends StatefulWidget {
   final String targetUserId;
+  final String? callId;
   final String chatName;
   final bool video;
 
-  const CallScreen({super.key, required this.targetUserId, required this.chatName, this.video = true});
+  const CallScreen({super.key, required this.targetUserId, this.callId, required this.chatName, this.video = true});
 
   @override
   State<CallScreen> createState() => _CallScreenState();
@@ -29,7 +30,9 @@ class _CallScreenState extends State<CallScreen> {
 
   Future<void> _start() async {
     try {
-      final session = await _service.makeCall(widget.targetUserId, video: widget.video);
+        final session = widget.callId == null
+          ? await _service.makeCall(widget.targetUserId, video: widget.video)
+          : await _service.acceptCall(widget.callId!, video: widget.video);
       if (!mounted) return;
       setState(() { _session = session; _status = 'Waiting for answer'; });
       _timer = Timer.periodic(const Duration(seconds: 1), (_) { if (mounted) setState(() => _seconds++); });
