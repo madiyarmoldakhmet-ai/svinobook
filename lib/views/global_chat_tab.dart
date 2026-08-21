@@ -116,7 +116,7 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
       delegate: UserSearchDelegate(
           firestore: firestore, currentUserId: currentUserId),
     ).then((selected) {
-      if (selected != null) {
+      if (selected != null && mounted) {
         final chatId = firestore.getChatRoomId(currentUserId, selected.id);
         Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => ChatScreen(chatId: chatId, chatName: selected.name),
