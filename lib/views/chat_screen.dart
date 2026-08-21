@@ -8,10 +8,10 @@ import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/chat_bubble.dart';
 import '../utils/image_picker_helper.dart';
+import '../utils/app_theme.dart';
 import 'call_screen.dart';
 
 const _bgDark = Color(0xFFE7EEF5);
-const _bgMid = Color(0xFFFFFFFF);
 const _neonCyan = Color(0xFF4A76A8);
 const _neonBlue = Color(0xFF527DA8);
 const _glassBg = Color(0xFFFFFFFF);
