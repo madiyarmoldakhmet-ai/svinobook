@@ -139,77 +139,77 @@ class DirectMessagesTab extends StatelessWidget {
                                 horizontal: 16,
                                 vertical: 8,
                               ),
-                            leading: GradientAvatar(
-                              name: name,
-                              radius: 22,
-                              backgroundImage: photoUrl != null
-                                  ? NetworkImage(photoUrl)
-                                  : null,
-                            ),
-                            title: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.textPrimary,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                if (unread > 0)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(90),
-                                    ),
+                              leading: GradientAvatar(
+                                name: name,
+                                radius: 22,
+                                backgroundImage: photoUrl != null
+                                    ? NetworkImage(photoUrl)
+                                    : null,
+                              ),
+                              title: Row(
+                                children: [
+                                  Expanded(
                                     child: Text(
-                                      '$unread',
+                                      name,
                                       style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
                                         fontWeight: FontWeight.w700,
+                                        color: AppColors.textPrimary,
+                                        fontSize: 16,
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                            subtitle: Row(
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  margin: const EdgeInsets.only(right: 6),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.neonGreen.withValues(
-                                      alpha: 0.8,
+                                  if (unread > 0)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        borderRadius: BorderRadius.circular(90),
+                                      ),
+                                      child: Text(
+                                        '$unread',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                     ),
-                                    shape: BoxShape.circle,
+                                ],
+                              ),
+                              subtitle: Row(
+                                children: [
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    margin: const EdgeInsets.only(right: 6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.neonGreen.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  status,
-                                  style: const TextStyle(
-                                    color: AppColors.textMuted,
-                                    fontSize: 13,
+                                  Text(
+                                    status,
+                                    style: const TextStyle(
+                                      color: AppColors.textMuted,
+                                      fontSize: 13,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                               onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => ChatScreen(
-                                    chatId: chatId,
-                                    chatName: name,
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ChatScreen(
+                                      chatId: chatId,
+                                      chatName: name,
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
                               },
                             ),
                           ),
