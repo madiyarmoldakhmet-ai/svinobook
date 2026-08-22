@@ -21,7 +21,7 @@ void main() {
 
     test('detects urgent priority and today due date', () {
       final result = AiAgentService.extractTaskFromText(
-        'Create a task: Rotate credentials urgently today',
+        'Create a task: Rotate credentials urgent today',
       );
 
       expect(result?.priority, 'High');
