@@ -64,146 +64,154 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ── Logo / Branding ──
-                  Container(
-                    width: 64,
-                    height: 64,
-                    margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.auto_awesome,
-                      size: 30,
-                      color: AppColors.onPrimary,
-                    ),
-                  ),
-                  const Text(
-                    'svinobook',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Copernicus',
-                      fontFamilyFallback: [
-                        'Tiempos Headline',
-                        'Cormorant Garamond',
-                        'serif',
-                      ],
-                      fontSize: 48,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: -1,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _isLogin
-                        ? 'Welcome back. Sign in to continue.'
-                        : 'Create an account to join the community.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 36),
-
-                  // ── Form Card ──
-                  GlassCard(
-                    padding: const EdgeInsets.all(24),
-                    borderRadius: 16,
-                    child: Column(
-                      children: [
-                        if (!_isLogin) ...[
-                          CustomTextField(
-                            controller: _usernameController,
-                            hintText: 'Username',
-                            prefixIcon: const Icon(
-                              Icons.person_outline,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                        ],
-                        CustomTextField(
-                          controller: _emailController,
-                          hintText: 'Email address',
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: const Icon(
-                            Icons.mail_outline,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        CustomTextField(
-                          controller: _passwordController,
-                          hintText: 'Password',
-                          obscureText: _obscurePassword,
-                          prefixIcon: const Icon(
-                            Icons.lock_outline,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: AppColors.textMuted,
-                              size: 20,
-                            ),
-                            onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        PrimaryButton(
-                          text: _isLogin ? 'Sign In' : 'Create Account',
-                          onPressed: _submit,
-                          isLoading: _isLoading,
-                          icon: _isLogin
-                              ? Icons.login_rounded
-                              : Icons.person_add_rounded,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () => setState(() => _isLogin = !_isLogin),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 14,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: _isLogin
-                                ? "Don't have an account? "
-                                : 'Already have an account? ',
-                          ),
-                          TextSpan(
-                            text: _isLogin ? 'Sign up' : 'Sign in',
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width > 528
+                    ? 480
+                    : MediaQuery.of(context).size.width - 48,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // ── Logo / Branding ──
+                    Container(
+                      width: 64,
+                      height: 64,
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome,
+                        size: 30,
+                        color: AppColors.onPrimary,
                       ),
                     ),
-                  ),
-                ],
+                    const Text(
+                      'svinobook',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Copernicus',
+                        fontFamilyFallback: [
+                          'Tiempos Headline',
+                          'Cormorant Garamond',
+                          'serif',
+                        ],
+                        fontSize: 48,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: -1,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _isLogin
+                          ? 'Welcome back. Sign in to continue.'
+                          : 'Create an account to join the community.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 36),
+
+                    // ── Form Card ──
+                    SizedBox(
+                      width: double.infinity,
+                      child: GlassCard(
+                        padding: const EdgeInsets.all(24),
+                        borderRadius: 16,
+                        child: Column(
+                          children: [
+                            if (!_isLogin) ...[
+                              CustomTextField(
+                                controller: _usernameController,
+                                hintText: 'Username',
+                                prefixIcon: const Icon(
+                                  Icons.person_outline,
+                                  color: AppColors.primary,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                            ],
+                            CustomTextField(
+                              controller: _emailController,
+                              hintText: 'Email address',
+                              keyboardType: TextInputType.emailAddress,
+                              prefixIcon: const Icon(
+                                Icons.mail_outline,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            CustomTextField(
+                              controller: _passwordController,
+                              hintText: 'Password',
+                              obscureText: _obscurePassword,
+                              prefixIcon: const Icon(
+                                Icons.lock_outline,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  color: AppColors.textMuted,
+                                  size: 20,
+                                ),
+                                onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            PrimaryButton(
+                              text: _isLogin ? 'Sign In' : 'Create Account',
+                              onPressed: _submit,
+                              isLoading: _isLoading,
+                              icon: _isLogin
+                                  ? Icons.login_rounded
+                                  : Icons.person_add_rounded,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () => setState(() => _isLogin = !_isLogin),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 14,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: _isLogin
+                                  ? "Don't have an account? "
+                                  : 'Already have an account? ',
+                            ),
+                            TextSpan(
+                              text: _isLogin ? 'Sign up' : 'Sign in',
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
