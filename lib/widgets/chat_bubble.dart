@@ -33,7 +33,9 @@ class ChatBubble extends StatelessWidget {
           color: Colors.black.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
         ),
         child: Text(
           codeContent,
@@ -48,24 +50,26 @@ class ChatBubble extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        fontSize: 15,
+        fontFamily: 'Salesforce-Sans',
+        fontFamilyFallback: const ['system-ui', '-apple-system', 'sans-serif'],
+        fontSize: 16,
         color: isMe ? Colors.white : AppColors.textPrimary,
-        height: 1.4,
+        height: 1.55,
       ),
     );
   }
 
-  BorderRadius _radiusFor(bool isMe) => BorderRadius.circular(3).copyWith(
-        bottomRight:
-            isMe ? const Radius.circular(4) : const Radius.circular(18),
-        bottomLeft:
-            isMe ? const Radius.circular(18) : const Radius.circular(4),
-      );
+  BorderRadius _radiusFor(bool isMe) => BorderRadius.circular(12).copyWith(
+    bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(12),
+    bottomLeft: isMe ? const Radius.circular(12) : const Radius.circular(4),
+  );
 
   @override
   Widget build(BuildContext context) {
     final showVideo = type == 'video';
-    final showImage = !showVideo && (type == 'image' || (imageUrl != null && imageUrl!.isNotEmpty));
+    final showImage =
+        !showVideo &&
+        (type == 'image' || (imageUrl != null && imageUrl!.isNotEmpty));
     final displayUrl = imageUrl ?? (type == 'image' ? text : null);
 
     final bgColor = isMe
@@ -95,35 +99,36 @@ class ChatBubble extends StatelessWidget {
         child: ClipRRect(
           borderRadius: _radiusFor(isMe),
           child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: bgColor,
-                border: Border.all(color: borderColor, width: 1),
-                borderRadius: _radiusFor(isMe),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!isMe)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        senderName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 11,
-                          color: AppColors.neonCyan.withValues(alpha: 0.8),
-                          letterSpacing: 0.5,
-                        ),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: bgColor,
+              border: Border.all(color: borderColor, width: 1),
+              borderRadius: _radiusFor(isMe),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!isMe)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      senderName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
+                        color: AppColors.primary,
+                        letterSpacing: 0.5,
                       ),
                     ),
-                  if (showImage &&
-                      displayUrl != null &&
-                      displayUrl.isNotEmpty) ...[
-                    if (showVideo)
-                      _VideoAttachment(url: displayUrl)
-                    else ClipRRect(
+                  ),
+                if (showImage &&
+                    displayUrl != null &&
+                    displayUrl.isNotEmpty) ...[
+                  if (showVideo)
+                    _VideoAttachment(url: displayUrl)
+                  else
+                    ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: CachedNetworkImage(
                         imageUrl: displayUrl,
@@ -133,36 +138,48 @@ class ChatBubble extends StatelessWidget {
                         placeholder: (context, url) => const SizedBox(
                           height: 150,
                           width: 200,
-                          child: Center(child: CircularProgressIndicator(color: AppColors.neonCyan, strokeWidth: 2)),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.neonCyan,
+                              strokeWidth: 2,
+                            ),
+                          ),
                         ),
                         errorWidget: (context, url, error) => const SizedBox(
                           height: 150,
                           width: 200,
-                          child: Center(child: Icon(Icons.broken_image, color: AppColors.textMuted)),
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    if (text.isNotEmpty && type != 'image')
-                      const SizedBox(height: 6),
-                  ],
                   if (text.isNotEmpty && type != 'image')
-                    _buildTextOrCode(context),
-                  const SizedBox(height: 4),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Text(
-                      DateFormat.jm().format(timestamp),
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.white.withValues(alpha: 0.45),
-                      ),
+                    const SizedBox(height: 6),
+                ],
+                if (text.isNotEmpty && type != 'image')
+                  _buildTextOrCode(context),
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    DateFormat.jm().format(timestamp),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isMe
+                          ? Colors.white.withValues(alpha: 0.7)
+                          : AppColors.textMuted,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 }
@@ -177,13 +194,48 @@ class _VideoAttachment extends StatefulWidget {
 class _VideoAttachmentState extends State<_VideoAttachment> {
   VideoPlayerController? _controller;
   @override
-  void initState() { super.initState(); if (widget.url != null) { _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!))..initialize().then((_) { if (mounted) setState(() {}); }); } }
+  void initState() {
+    super.initState();
+    if (widget.url != null) {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!))
+        ..initialize().then((_) {
+          if (mounted) setState(() {});
+        });
+    }
+  }
+
   @override
-  void dispose() { _controller?.dispose(); super.dispose(); }
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = _controller;
-    if (controller == null || !controller.value.isInitialized) return const SizedBox(width: 220, height: 160, child: Center(child: CircularProgressIndicator()));
-    return Stack(alignment: Alignment.center, children: [SizedBox(width: 220, height: 160, child: VideoPlayer(controller)), IconButton(onPressed: () => setState(() => controller.value.isPlaying ? controller.pause() : controller.play()), icon: Icon(controller.value.isPlaying ? Icons.pause_circle : Icons.play_circle, color: Colors.white, size: 48))]);
+    if (controller == null || !controller.value.isInitialized)
+      return const SizedBox(
+        width: 220,
+        height: 160,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(width: 220, height: 160, child: VideoPlayer(controller)),
+        IconButton(
+          onPressed: () => setState(
+            () => controller.value.isPlaying
+                ? controller.pause()
+                : controller.play(),
+          ),
+          icon: Icon(
+            controller.value.isPlaying ? Icons.pause_circle : Icons.play_circle,
+            color: Colors.white,
+            size: 48,
+          ),
+        ),
+      ],
+    );
   }
 }

@@ -1,67 +1,71 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// Svinobook's compact early-social-network visual system.
+/// Shared visual tokens for Svinobook's messaging surfaces.
 
 class AppColors {
   AppColors._();
 
-  // ── VK-era blue and gray surfaces ──
-  static const bgDarkest = Color(0xFFE7EEF5);
-  static const bgDark = Color(0xFFD7E3EE);
+  // ── DESIGN.md surfaces ──
+  static const bgDarkest = Color(0xFFF4EDE4);
+  static const bgDark = Color(0xFFF9F0FF);
   static const bgMid = Color(0xFFFFFFFF);
-  static const bgLight = Color(0xFFF3F6F9);
+  static const bgLight = Color(0xFFF9F0FF);
 
-  // ── Classic interface blue ──
-  static const neonCyan = Color(0xFF4A76A8);
-  static const neonBlue = Color(0xFF527DA8);
-  static const neonPurple = Color(0xFF527DA8);
-  static const neonGreen = Color(0xFF4D9B6A);
+  // ── Aubergine primary ──
+  static const primary = Color(0xFF4A154B);
+  static const primaryDeep = Color(0xFF481A54);
+  static const primaryPress = Color(0xFF611F69);
+  static const primaryTint = Color(0xFF592466);
+  static const neonCyan = primary;
+  static const neonBlue = primaryTint;
+  static const neonPurple = primaryTint;
+  static const neonGreen = Color(0xFF007A5A);
 
   // ── Glassmorphism ──
   static const glassBg = Color(0xFFFFFFFF);
-  static const glassBorder = Color(0xFFC7D5E0);
-  static const glassHighlight = Color(0xFFF8FAFC);
+  static const glassBorder = Color(0xFFE6E6E6);
+  static const glassHighlight = Color(0xFFF9F0FF);
 
   // ── Semantic ──
-  static const textPrimary = Color(0xFF2B4053);
-  static const textSecondary = Color(0xFF607D94);
-  static const textMuted = Color(0xFF91A4B4);
-  static const danger = Color(0xFFD45B5B);
-  static const success = Color(0xFF4D9B6A);
+  static const textPrimary = Color(0xFF1D1D1D);
+  static const textSecondary = Color(0xFF696969);
+  static const textMuted = Color(0xFF696969);
+  static const danger = Color(0xFFCC4117);
+  static const success = Color(0xFF007A5A);
 
   // ── Gradients ──
   static const primaryGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF5C89B5), Color(0xFF426C9A)],
+    colors: [primaryTint, primary],
   );
 
   static const accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF5C89B5), Color(0xFF426C9A)],
+    colors: [primaryTint, primary],
   );
 
   static const backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFDDE9F3), Color(0xFFF7F9FB), Color(0xFFE2ECF4)],
+    colors: [Color(0xFFF9F0FF), Colors.white, Color(0xFFF4EDE4)],
     stops: [0.0, 0.5, 1.0],
   );
 }
 
-/// Compact light theme for the entire app.
+/// Light theme for the entire app.
 class AppTheme {
   AppTheme._();
 
   static ThemeData get darkTheme {
     const scheme = ColorScheme.light(
-      primary: AppColors.neonCyan,
+      primary: AppColors.primary,
       onPrimary: Colors.white,
-      secondary: AppColors.neonBlue,
+      secondary: AppColors.primaryTint,
       onSecondary: Colors.white,
-      tertiary: AppColors.neonPurple,
+      tertiary: AppColors.primaryDeep,
       surface: AppColors.bgMid,
       onSurface: AppColors.textPrimary,
       error: AppColors.danger,
@@ -69,39 +73,69 @@ class AppTheme {
     );
 
     const base = TextTheme(
-        displayLarge: TextStyle(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w700,
-        ),
-        headlineMedium: TextStyle(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w700,
-        ),
-        titleLarge: TextStyle(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-        bodyLarge: TextStyle(color: AppColors.textPrimary, height: 1.35),
-        bodyMedium: TextStyle(color: AppColors.textSecondary, height: 1.35),
-        labelLarge: TextStyle(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-      );
+      displayLarge: TextStyle(
+        fontFamily: 'Salesforce-Avant-Garde',
+        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        color: AppColors.textPrimary,
+        fontSize: 32,
+        height: 1.25,
+        fontWeight: FontWeight.w700,
+      ),
+      headlineMedium: TextStyle(
+        fontFamily: 'Salesforce-Avant-Garde',
+        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        color: AppColors.textPrimary,
+        fontSize: 24,
+        height: 1.33,
+        fontWeight: FontWeight.w700,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: 'Salesforce-Avant-Garde',
+        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        color: AppColors.textPrimary,
+        fontSize: 22,
+        height: 1.4,
+        fontWeight: FontWeight.w600,
+      ),
+      bodyLarge: TextStyle(
+        fontFamily: 'Salesforce-Sans',
+        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        color: AppColors.textPrimary,
+        fontSize: 18,
+        height: 1.55,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: 'Salesforce-Sans',
+        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        color: AppColors.textSecondary,
+        fontSize: 16,
+        height: 1.55,
+      ),
+      labelLarge: TextStyle(
+        fontFamily: 'Salesforce-Sans',
+        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.w700,
+        fontSize: 16,
+        height: 1.38,
+      ),
+    );
 
     return ThemeData(
-      useMaterial3: false,
+      useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.bgDarkest,
       textTheme: base,
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.neonCyan,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 1,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
         centerTitle: false,
         titleTextStyle: const TextStyle(
-          color: AppColors.textPrimary,
+          color: Colors.white,
+          fontFamily: 'Salesforce-Avant-Garde',
+          fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
@@ -109,19 +143,22 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.glassBg,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 11,
+        ),
         hintStyle: TextStyle(color: AppColors.textMuted),
         labelStyle: TextStyle(color: AppColors.textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(3)),
+          borderRadius: BorderRadius.all(Radius.circular(4)),
           borderSide: BorderSide(color: AppColors.glassBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(3)),
+          borderRadius: BorderRadius.all(Radius.circular(4)),
           borderSide: BorderSide(color: AppColors.glassBorder, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(3)),
+          borderRadius: BorderRadius.all(Radius.circular(4)),
           borderSide: const BorderSide(color: AppColors.neonCyan, width: 1),
         ),
       ),
@@ -132,21 +169,27 @@ class AppTheme {
           elevation: 1,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(90),
           ),
           textStyle: const TextStyle(
+            fontFamily: 'Salesforce-Sans',
+            fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.neonCyan,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          foregroundColor: AppColors.primary,
+          textStyle: const TextStyle(
+            fontFamily: 'Salesforce-Sans',
+            fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
-      iconTheme: const IconThemeData(color: AppColors.neonCyan),
+      iconTheme: const IconThemeData(color: AppColors.primary),
       dividerTheme: DividerThemeData(
         color: AppColors.glassBorder,
         thickness: 1,
@@ -156,17 +199,18 @@ class AppTheme {
         backgroundColor: AppColors.bgLight,
         contentTextStyle: const TextStyle(color: AppColors.textPrimary),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(3),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.transparent,
-        selectedItemColor: AppColors.neonCyan,
+        selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textMuted,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+        selectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
         unselectedLabelStyle: TextStyle(fontSize: 12),
       ),
     );
@@ -210,15 +254,17 @@ class GlassCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: color ?? AppColors.glassBg,
               borderRadius: br,
-              border: border ??
-                  Border.all(color: AppColors.glassBorder, width: 1),
-              boxShadow: boxShadow ?? const [
-                BoxShadow(
-                  color: Color(0x18000000),
-                  blurRadius: 2,
-                  offset: Offset(0, 1),
-                ),
-              ],
+              border:
+                  border ?? Border.all(color: AppColors.glassBorder, width: 1),
+              boxShadow:
+                  boxShadow ??
+                  const [
+                    BoxShadow(
+                      color: Color(0x18000000),
+                      blurRadius: 2,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
             ),
             child: child,
           ),

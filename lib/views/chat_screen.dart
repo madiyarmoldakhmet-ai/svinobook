@@ -11,11 +11,11 @@ import '../widgets/chat_bubble.dart';
 import '../utils/app_theme.dart';
 import 'call_screen.dart';
 
-const _bgDark = Color(0xFFE7EEF5);
-const _neonCyan = Color(0xFF4A76A8);
-const _neonBlue = Color(0xFF527DA8);
-const _glassBg = Color(0xFFFFFFFF);
-const _glassBorder = Color(0xFFC7D5E0);
+const _bgDark = AppColors.bgDark;
+const _neonCyan = AppColors.primary;
+const _neonBlue = AppColors.primaryTint;
+const _glassBg = AppColors.bgMid;
+const _glassBorder = AppColors.glassBorder;
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -74,21 +74,25 @@ class _ChatScreenState extends State<ChatScreen> {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (currentUserId.isNotEmpty) {
       FirebaseFirestore.instance.collection('chats').doc(widget.chatId).set({
-        'typing': {
-          currentUserId: typing,
-        }
+        'typing': {currentUserId: typing},
       }, SetOptions(merge: true));
     }
   }
 
-  Future<void> _pickMedia({required bool video, ImageSource source = ImageSource.gallery}) async {
+  Future<void> _pickMedia({
+    required bool video,
+    ImageSource source = ImageSource.gallery,
+  }) async {
     try {
       final media = video
           ? await _mediaService.pickVideo(source: source)
           : await _mediaService.pickImage(source: source);
       if (media != null && mounted) setState(() => _selectedMedia = media);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Media selection failed: $e')));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Media selection failed: $e')));
     }
   }
 
@@ -100,14 +104,17 @@ class _ChatScreenState extends State<ChatScreen> {
     final firestore = context.read<FirestoreService>();
     final currentUser = FirebaseAuth.instance.currentUser;
     final senderId = currentUser?.uid ?? '';
-    final senderName = currentUser?.displayName ??
-        currentUser?.email?.split('@')[0] ??
-        'User';
+    final senderName =
+        currentUser?.displayName ?? currentUser?.email?.split('@')[0] ?? 'User';
 
     try {
       String? mediaUrl;
       if (_selectedMedia != null) {
-        mediaUrl = await _mediaService.upload(_selectedMedia!, widget.chatId, senderId);
+        mediaUrl = await _mediaService.upload(
+          _selectedMedia!,
+          widget.chatId,
+          senderId,
+        );
       }
       await firestore.sendMessage(
         chatRoomId: widget.chatId,
@@ -122,9 +129,9 @@ class _ChatScreenState extends State<ChatScreen> {
       if (mounted) setState(() => _selectedMedia = null);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error sending message: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sending message: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSending = false);
@@ -134,18 +141,24 @@ class _ChatScreenState extends State<ChatScreen> {
   void _startCall({required bool video}) {
     final parts = widget.chatId.split('_');
     final currentId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final targetId = parts.length == 2 ? (parts[0] == currentId ? parts[1] : parts[0]) : '';
+    final targetId = parts.length == 2
+        ? (parts[0] == currentId ? parts[1] : parts[0])
+        : '';
     if (targetId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('This chat has no call recipient yet')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('This chat has no call recipient yet')),
+      );
       return;
     }
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => CallScreen(
-        targetUserId: targetId,
-        chatName: widget.chatName,
-        video: video,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CallScreen(
+          targetUserId: targetId,
+          chatName: widget.chatName,
+          video: video,
+        ),
       ),
-    ));
+    );
   }
 
   //  BUILD — compact personal chat layout
@@ -166,9 +179,7 @@ class _ChatScreenState extends State<ChatScreen> {
             _buildHeader(topPad),
 
             // ── Messages area ──
-            Expanded(
-              child: _buildMessageArea(currentUserId),
-            ),
+            Expanded(child: _buildMessageArea(currentUserId)),
 
             // ── Typing indicator ──
             _buildTypingIndicator(currentUserId),
@@ -200,120 +211,118 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
       child: Row(
-            children: [
-              // Back button — always visible and clickable
-              IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: _glassBg,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: _glassBorder, width: 1),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: _neonCyan,
-                    size: 18,
-                  ),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
+        children: [
+          // Back button — always visible and clickable
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: _glassBg,
+                shape: BoxShape.circle,
+                border: Border.all(color: _glassBorder, width: 1),
               ),
-              const SizedBox(width: 4),
-              // Avatar placeholder
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [_neonCyan, _neonBlue],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _neonCyan.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                    ),
-                  ],
+              child: const Icon(
+                Icons.arrow_back_ios_new,
+                color: _neonCyan,
+                size: 18,
+              ),
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          const SizedBox(width: 4),
+          // Avatar placeholder
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(colors: [_neonCyan, _neonBlue]),
+              boxShadow: [
+                BoxShadow(
+                  color: _neonCyan.withValues(alpha: 0.3),
+                  blurRadius: 10,
+                  spreadRadius: 1,
                 ),
-                child: Center(
-                  child: Text(
-                    widget.chatName.isNotEmpty
-                        ? widget.chatName[0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                widget.chatName.isNotEmpty
+                    ? widget.chatName[0].toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
-              const SizedBox(width: 12),
-              // Name + status
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Name + status
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.chatName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    letterSpacing: 0.3,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Row(
                   children: [
-                    Text(
-                      widget.chatName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        letterSpacing: 0.3,
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: _neonCyan.withValues(alpha: 0.8),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _neonCyan.withValues(alpha: 0.5),
+                            blurRadius: 6,
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Container(
-                          width: 7,
-                          height: 7,
-                          decoration: BoxDecoration(
-                            color: _neonCyan.withValues(alpha: 0.8),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: _neonCyan.withValues(alpha: 0.5),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Online',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 5),
+                    Text(
+                      'Online',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
+              ],
+            ),
+          ),
+          // Call button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _glassBg,
+                shape: BoxShape.circle,
+                border: Border.all(color: _glassBorder, width: 1),
               ),
-              // Call button
-              IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _glassBg,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: _glassBorder, width: 1),
-                  ),
-                  child: const Icon(Icons.phone, color: _neonCyan, size: 20),
-                ),
-                onPressed: () => _startCall(video: false),
-              ),
-              IconButton(
-                tooltip: 'Video call',
-                icon: const Icon(Icons.videocam, color: Colors.white),
-                onPressed: () => _startCall(video: true),
-              ),
-            ],
+              child: const Icon(Icons.phone, color: _neonCyan, size: 20),
+            ),
+            onPressed: () => _startCall(video: false),
+          ),
+          IconButton(
+            tooltip: 'Video call',
+            icon: const Icon(Icons.videocam, color: Colors.white),
+            onPressed: () => _startCall(video: true),
+          ),
+        ],
       ),
     );
   }
@@ -321,7 +330,9 @@ class _ChatScreenState extends State<ChatScreen> {
   // ── MESSAGES: Animated floating bubbles ──
   Widget _buildMessageArea(String currentUserId) {
     return StreamBuilder<List<ChatMessageModel>>(
-      stream: context.read<FirestoreService>().getDirectMessagesStream(widget.chatId),
+      stream: context.read<FirestoreService>().getDirectMessagesStream(
+        widget.chatId,
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -340,7 +351,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Text(
                   'Loading messages...',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
+                    color: AppColors.textSecondary,
                     fontSize: 13,
                   ),
                 ),
@@ -352,7 +363,7 @@ class _ChatScreenState extends State<ChatScreen> {
           return Center(
             child: Text(
               'Error loading chat: ${snapshot.error}',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           );
         }
@@ -371,7 +382,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Text(
                   'No messages yet',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.35),
+                    color: AppColors.textSecondary,
                     fontStyle: FontStyle.italic,
                     fontSize: 15,
                   ),
@@ -379,10 +390,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 const SizedBox(height: 4),
                 Text(
                   'Send the first message!',
-                  style: TextStyle(
-                    color: _neonCyan.withValues(alpha: 0.3),
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: AppColors.primary, fontSize: 12),
                 ),
               ],
             ),
@@ -430,7 +438,9 @@ class _ChatScreenState extends State<ChatScreen> {
           .doc(widget.chatId)
           .snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data != null && snapshot.data!.exists) {
+        if (snapshot.hasData &&
+            snapshot.data != null &&
+            snapshot.data!.exists) {
           final data = snapshot.data!.data() as Map<String, dynamic>?;
           if (data != null && data['typing'] != null) {
             final typingMap = data['typing'] as Map<String, dynamic>;
@@ -498,93 +508,121 @@ class _ChatScreenState extends State<ChatScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: Container(
-                  decoration: BoxDecoration(
-                    color: _glassBg,
-                    borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: _glassBorder),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  child: Row(
-                    children: [
-                      // Attach media button
-                      IconButton(
-                        icon: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: _neonCyan.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.photo_outlined,
-                            color: _neonCyan.withValues(alpha: 0.7),
-                            size: 20,
-                          ),
+                decoration: BoxDecoration(
+                  color: _glassBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _glassBorder),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: Row(
+                  children: [
+                    // Attach media button
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _neonCyan.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
-                        onPressed: () => showModalBottomSheet<void>(
-                          context: context,
-                          builder: (_) => SafeArea(child: Wrap(children: [
-                            ListTile(leading: const Icon(Icons.photo), title: const Text('Photo'), onTap: () { Navigator.pop(context); _pickMedia(video: false); }),
-                            ListTile(leading: const Icon(Icons.video_library), title: const Text('Video'), onTap: () { Navigator.pop(context); _pickMedia(video: true); }),
-                            ListTile(leading: const Icon(Icons.camera_alt), title: const Text('Camera'), onTap: () { Navigator.pop(context); _pickMedia(video: false, source: ImageSource.camera); }),
-                          ])),
+                        child: Icon(
+                          Icons.photo_outlined,
+                          color: _neonCyan.withValues(alpha: 0.7),
+                          size: 20,
                         ),
                       ),
-                      // Text field
-                      Expanded(
-                        child: TextField(
-                          controller: _messageController,
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                      onPressed: () => showModalBottomSheet<void>(
+                        context: context,
+                        builder: (_) => SafeArea(
+                          child: Wrap(
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.photo),
+                                title: const Text('Photo'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _pickMedia(video: false);
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.video_library),
+                                title: const Text('Video'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _pickMedia(video: true);
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.camera_alt),
+                                title: const Text('Camera'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _pickMedia(
+                                    video: false,
+                                    source: ImageSource.camera,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Text field
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 15,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Type a message...',
+                          hintStyle: TextStyle(
+                            color: AppColors.textMuted,
                             fontSize: 15,
                           ),
-                          decoration: InputDecoration(
-                            hintText: 'Type a message...',
-                            hintStyle: TextStyle(
-                              color: AppColors.textMuted,
-                              fontSize: 15,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 10,
-                            ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 10,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      // Send button
-                      _isSending
-                          ? Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: _neonCyan.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            )
-                          : GestureDetector(
-                              onTap: _sendMessage,
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [_neonCyan, _neonBlue],
-                                  ),
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
-                                child: const Icon(
-                                  Icons.send_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
+                    ),
+                    const SizedBox(width: 4),
+                    // Send button
+                    _isSending
+                        ? Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: _neonCyan.withValues(alpha: 0.6),
                               ),
                             ),
-                    ],
-                  ),
+                          )
+                        : GestureDetector(
+                            onTap: _sendMessage,
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [_neonCyan, _neonBlue],
+                                ),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Icon(
+                                Icons.send_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                  ],
                 ),
+              ),
             ),
           ],
         ),
