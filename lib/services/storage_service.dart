@@ -2,7 +2,11 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseStorage? _storage;
+
+  StorageService({FirebaseStorage? storage}) : _storage = storage;
+
+  FirebaseStorage get _firebaseStorage => _storage ?? FirebaseStorage.instance;
 
   Future<String?> uploadImage({
     required Uint8List fileBytes,
@@ -10,7 +14,7 @@ class StorageService {
     required String fileName,
   }) async {
     try {
-      final Reference ref = _storage.ref().child(folder).child(fileName);
+      final Reference ref = _firebaseStorage.ref().child(folder).child(fileName);
       final UploadTask uploadTask = ref.putData(
         fileBytes,
         SettableMetadata(contentType: 'image/jpeg'),
@@ -30,7 +34,7 @@ class StorageService {
     required String contentType,
   }) async {
     try {
-      final ref = _storage.ref().child(folder).child(fileName);
+      final ref = _firebaseStorage.ref().child(folder).child(fileName);
       final snapshot = await ref.putData(
         fileBytes,
         SettableMetadata(contentType: contentType),

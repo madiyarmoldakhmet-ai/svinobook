@@ -58,7 +58,7 @@ void main() {
           maxDuration: any(named: 'maxDuration'),
         )).thenAnswer((_) async => null);
 
-    final media = await MediaService(picker: picker).pickVideo();
+    final media = await MediaService(picker: picker, storage: _StorageServiceFake()).pickVideo();
 
     expect(media, isNull);
   });
