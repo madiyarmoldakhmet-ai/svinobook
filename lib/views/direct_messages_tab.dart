@@ -130,11 +130,15 @@ class DirectMessagesTab extends StatelessWidget {
                             border: Border.all(color: AppColors.glassBorder),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            clipBehavior: Clip.antiAlias,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                             leading: GradientAvatar(
                               name: name,
                               radius: 22,
@@ -197,7 +201,7 @@ class DirectMessagesTab extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            onTap: () {
+                              onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => ChatScreen(
@@ -206,7 +210,8 @@ class DirectMessagesTab extends StatelessWidget {
                                   ),
                                 ),
                               );
-                            },
+                              },
+                            ),
                           ),
                         );
                       },
