@@ -66,6 +66,9 @@ class AppColors {
     colors: [canvas, surfaceSoft, canvas],
     stops: [0.0, 0.5, 1.0],
   );
+
+  static const onPrimary = Colors.white;
+  static const onDarkSoft = Color(0xFFA09D96);
 }
 
 /// Light theme for the entire app.
@@ -142,6 +145,7 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.bgDarkest,
       textTheme: base,
+      visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -196,9 +200,10 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
           textStyle: const TextStyle(
-            fontFamily: 'Salesforce-Sans',
-            fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
-            fontWeight: FontWeight.w700,
+            fontFamily: 'StyreneB',
+            fontFamilyFallback: ['Inter', 'sans-serif'],
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -209,8 +214,8 @@ class AppTheme {
         space: 1,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.bgLight,
-        contentTextStyle: const TextStyle(color: AppColors.textPrimary),
+        backgroundColor: AppColors.surfaceDark,
+        contentTextStyle: const TextStyle(color: AppColors.onDark),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -265,7 +270,7 @@ class GlassCard extends StatelessWidget {
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
-              color: color ?? AppColors.glassBg,
+              color: color ?? AppColors.surfaceCard,
               borderRadius: br,
               border:
                   border ?? Border.all(color: AppColors.glassBorder, width: 1),

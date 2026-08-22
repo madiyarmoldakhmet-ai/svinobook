@@ -167,18 +167,13 @@ class _ProfileTabState extends State<ProfileTab> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
+                          color: AppColors.surfaceCard,
                           borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.neonCyan.withValues(alpha: 0.3),
-                              blurRadius: 12,
-                            ),
-                          ],
+                          border: Border.all(color: AppColors.glassBorder),
                         ),
                         child: const Icon(
                           Icons.person_rounded,
-                          color: AppColors.bgDarkest,
+                          color: AppColors.primary,
                         ),
                       ),
                       const SizedBox(width: 14),

@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDarkest,
+      backgroundColor: AppColors.canvas,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth >= 760;
@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1080),
+                    constraints: const BoxConstraints(maxWidth: 1200),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -137,23 +137,29 @@ class _ClassicTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
-      color: AppColors.surfaceDark,
+      height: 64,
+      color: AppColors.canvas,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1080),
+          constraints: const BoxConstraints(maxWidth: 1200),
           child: Row(
             children: [
-              const SizedBox(width: 14),
+              const SizedBox(width: 24),
               const Text(
-                'svinobook',
+                '✳ svinobook',
                 style: TextStyle(
-                  color: AppColors.onDark,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Copernicus',
+                  fontFamilyFallback: [
+                    'Tiempos Headline',
+                    'Cormorant Garamond',
+                    'serif',
+                  ],
+                  fontSize: 24,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 32),
               SizedBox(
                 width: 230,
                 height: 28,
@@ -170,23 +176,26 @@ class _ClassicTopBar extends StatelessWidget {
                       size: 17,
                     ),
                     filled: true,
-                    fillColor: Colors.black.withValues(alpha: 0.12),
-                    contentPadding: EdgeInsets.zero,
+                    fillColor: AppColors.surfaceSoft,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                  ),
                 ),
               ),
               const Spacer(),
               const Icon(
                 Icons.notifications_none,
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 size: 20,
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 24),
             ],
           ),
         ),
@@ -213,9 +222,9 @@ class _ClassicSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 174,
+      width: 208,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 14, 10, 0),
+        padding: const EdgeInsets.fromLTRB(16, 32, 24, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -226,14 +235,22 @@ class _ClassicSidebar extends StatelessWidget {
                 onTap: () => onTap(index),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 8,
+                    horizontal: 12,
+                    vertical: 12,
                   ),
-                  color: selected ? AppColors.surfaceCard : Colors.transparent,
+                  color: selected
+                      ? AppColors.surfaceCreamStrong
+                      : Colors.transparent,
                   child: Row(
                     children: [
-                      Icon(item.icon, size: 17, color: AppColors.primary),
-                      const SizedBox(width: 9),
+                      Icon(
+                        item.icon,
+                        size: 19,
+                        color: selected
+                            ? AppColors.primary
+                            : AppColors.textMuted,
+                      ),
+                      const SizedBox(width: 12),
                       Text(
                         item.label,
                         style: TextStyle(
@@ -242,7 +259,7 @@ class _ClassicSidebar extends StatelessWidget {
                               : AppColors.textMuted,
                           fontSize: 13,
                           fontWeight: selected
-                              ? FontWeight.w700
+                              ? FontWeight.w500
                               : FontWeight.w400,
                         ),
                       ),
@@ -256,7 +273,11 @@ class _ClassicSidebar extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8),
               child: Text(
                 'COMMUNITY',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 10),
+                style: TextStyle(
+                  color: AppColors.textMutedSoft,
+                  fontSize: 12,
+                  letterSpacing: 1.5,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -264,7 +285,7 @@ class _ClassicSidebar extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8),
               child: Text(
                 'Help  •  Settings',
-                style: TextStyle(color: AppColors.neonCyan, fontSize: 12),
+                style: TextStyle(color: AppColors.textMuted, fontSize: 14),
               ),
             ),
           ],
@@ -292,7 +313,7 @@ class _GlassNavBar extends StatelessWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
         color: AppColors.canvas,
         border: Border.all(color: AppColors.glassBorder),
@@ -315,7 +336,9 @@ class _GlassNavBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
               decoration: BoxDecoration(
-                color: selected ? AppColors.surfaceCard : Colors.transparent,
+                color: selected
+                    ? AppColors.surfaceCreamStrong
+                    : Colors.transparent,
                 border: selected
                     ? Border.all(color: AppColors.glassBorder)
                     : null,

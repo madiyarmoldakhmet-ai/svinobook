@@ -59,56 +59,44 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        color: AppColors.canvas,
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // ── Logo / Branding ──
                   Container(
-                    width: 88,
-                    height: 88,
+                    width: 64,
+                    height: 64,
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.neonCyan.withValues(alpha: 0.4),
-                          blurRadius: 24,
-                          spreadRadius: 2,
-                        ),
-                      ],
                     ),
                     child: const Icon(
-                      Icons.bolt,
-                      size: 48,
-                      color: AppColors.bgDarkest,
+                      Icons.auto_awesome,
+                      size: 30,
+                      color: AppColors.onPrimary,
                     ),
                   ),
-                  ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [AppColors.neonCyan, AppColors.neonBlue],
-                    ).createShader(bounds),
-                    child: const Text(
-                      'svinobook',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Copernicus',
-                        fontFamilyFallback: [
-                          'Tiempos Headline',
-                          'Cormorant Garamond',
-                          'serif',
-                        ],
-                        fontSize: 48,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: -1,
-                        color: Colors.white,
-                      ),
+                  const Text(
+                    'svinobook',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Copernicus',
+                      fontFamilyFallback: [
+                        'Tiempos Headline',
+                        'Cormorant Garamond',
+                        'serif',
+                      ],
+                      fontSize: 48,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -1,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -119,7 +107,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: AppColors.textMuted,
+                      color: AppColors.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -137,7 +125,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             hintText: 'Username',
                             prefixIcon: const Icon(
                               Icons.person_outline,
-                              color: AppColors.neonCyan,
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -149,7 +137,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           keyboardType: TextInputType.emailAddress,
                           prefixIcon: const Icon(
                             Icons.mail_outline,
-                            color: AppColors.neonCyan,
+                            color: AppColors.primary,
                             size: 20,
                           ),
                         ),
@@ -160,7 +148,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           obscureText: _obscurePassword,
                           prefixIcon: const Icon(
                             Icons.lock_outline,
-                            color: AppColors.neonCyan,
+                            color: AppColors.primary,
                             size: 20,
                           ),
                           suffixIcon: IconButton(
@@ -207,7 +195,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           TextSpan(
                             text: _isLogin ? 'Sign up' : 'Sign in',
                             style: const TextStyle(
-                              color: AppColors.neonCyan,
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

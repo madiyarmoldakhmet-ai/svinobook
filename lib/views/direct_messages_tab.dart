@@ -26,14 +26,14 @@ class DirectMessagesTab extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.fromLTRB(16, topPad + 14, 16, 12),
-            color: AppColors.neonCyan,
+            color: AppColors.surfaceDark,
             child: Row(
               children: [
                 const Expanded(
                   child: Text(
                     'Messages',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.onDark,
                       fontWeight: FontWeight.w700,
                       fontSize: 20,
                     ),
@@ -161,7 +161,7 @@ class DirectMessagesTab extends StatelessWidget {
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.neonCyan,
+                                      color: AppColors.primary,
                                       borderRadius: BorderRadius.circular(90),
                                     ),
                                     child: Text(

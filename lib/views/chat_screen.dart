@@ -202,12 +202,9 @@ class _ChatScreenState extends State<ChatScreen> {
         bottom: 12,
       ),
       decoration: BoxDecoration(
-        color: _neonCyan,
+        color: AppColors.surfaceDark,
         border: Border(
-          bottom: BorderSide(
-            color: _neonCyan.withValues(alpha: 0.15),
-            width: 1,
-          ),
+          bottom: BorderSide(color: AppColors.surfaceDarkElevated, width: 1),
         ),
       ),
       child: Row(
@@ -236,14 +233,7 @@ class _ChatScreenState extends State<ChatScreen> {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(colors: [_neonCyan, _neonBlue]),
-              boxShadow: [
-                BoxShadow(
-                  color: _neonCyan.withValues(alpha: 0.3),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ],
+              color: AppColors.primary,
             ),
             child: Center(
               child: Text(
@@ -281,7 +271,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       width: 7,
                       height: 7,
                       decoration: BoxDecoration(
-                        color: _neonCyan.withValues(alpha: 0.8),
+                        color: AppColors.success,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
