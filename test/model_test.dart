@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:svinobook/models/security_alert_model.dart';
 import 'package:svinobook/models/task_card_model.dart';
+import 'package:svinobook/models/chat_message_model.dart';
+import 'package:svinobook/models/chat_session_model.dart';
+import 'package:svinobook/models/post_model.dart';
+import 'package:svinobook/models/user_model.dart';
 
 void main() {
   test('TaskCardModel round-trips Firestore values', () {
@@ -64,5 +68,81 @@ void main() {
     expect(model.severity, 'medium');
     expect(model.source, 'External');
     expect(model.type, 'port_scan_detected');
+  });
+
+  test('ChatMessageModel parses media and serializes it', () {
+    final timestamp = DateTime(2026, 8, 22);
+    final model = ChatMessageModel.fromMap({
+      'senderId': 'alice',
+      'senderName': 'Alice',
+      'text': 'Photo',
+      'imageUrl': 'https://example.test/photo.jpg',
+      'timestamp': Timestamp.fromDate(timestamp),
+      'isRead': true,
+      'isGroup': false,
+      'chatRoomId': 'alice_bob',
+      'type': 'image',
+      'alertType': 'security_alert',
+      'alertStatus': 'high',
+      'alertDetails': 'Details',
+      'alertSource': 'Monitor',
+    }, 'message-1');
+
+    expect(model.id, 'message-1');
+    expect(model.url, 'https://example.test/photo.jpg');
+    expect(model.toMap()['type'], 'image');
+    expect(model.toMap()['isRead'], isTrue);
+  });
+
+  test('ChatMessageModel uses defaults for text messages', () {
+    final model = ChatMessageModel.fromMap({}, 'message-2');
+
+    expect(model.senderName, 'Unknown');
+    expect(model.type, 'text');
+    expect(model.isGroup, isFalse);
+  });
+
+  test('ChatSessionModel round-trips participants', () {
+    final updated = DateTime(2026, 8, 22, 14);
+    final model = ChatSessionModel.fromMap({
+      'participantIds': ['alice', 'bob'],
+      'participantNames': ['Alice', 'Bob'],
+      'lastMessage': 'See you',
+      'lastUpdated': Timestamp.fromDate(updated),
+    }, 'chat-1');
+
+    expect(model.participantIds, ['alice', 'bob']);
+    expect(model.lastMessage, 'See you');
+    expect(model.toMap()['participantNames'], ['Alice', 'Bob']);
+  });
+
+  test('PostModel supports legacy field names', () {
+    final created = DateTime(2026, 8, 22);
+    final model = PostModel.fromMap({
+      'authorId': 'alice',
+      'authorName': 'Alice',
+      'content': 'Hello',
+      'createdAt': Timestamp.fromDate(created),
+    }, 'post-1');
+
+    expect(model.authorId, 'alice');
+    expect(model.authorName, 'Alice');
+    expect(model.content, 'Hello');
+    expect(model.createdAt, created);
+    expect(model.likes, 0);
+    expect(model.toMap()['text'], 'Hello');
+  });
+
+  test('UserModel supports legacy getters and serialization', () {
+    final model = UserModel.fromMap({
+      'username': 'Alice',
+      'email': 'alice@example.test',
+      'photoUrl': 'https://example.test/alice.jpg',
+    }, 'alice');
+
+    expect(model.uid, 'alice');
+    expect(model.username, 'Alice');
+    expect(model.email, 'alice@example.test');
+    expect(model.toMap()['photoUrl'], contains('alice.jpg'));
   });
 }

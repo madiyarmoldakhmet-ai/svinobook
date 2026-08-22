@@ -31,4 +31,10 @@ void main() {
       throwsA(isA<StateError>()),
     );
   });
+
+  test('unauthenticated users receive an empty incoming-call stream', () {
+    final service = CallService(firestore: FakeFirebaseFirestore());
+
+    expect(service.listenForCalls(), emitsDone);
+  });
 }

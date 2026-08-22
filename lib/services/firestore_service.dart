@@ -10,8 +10,12 @@ import '../services/ai_agent_service.dart';
 import 'storage_service.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final StorageService _storage = StorageService();
+  final FirebaseFirestore _db;
+  final StorageService _storage;
+
+  FirestoreService({FirebaseFirestore? firestore, StorageService? storage})
+      : _db = firestore ?? FirebaseFirestore.instance,
+        _storage = storage ?? StorageService();
 
   // --- Profile / Users ---
   Future<void> updateProfile({
