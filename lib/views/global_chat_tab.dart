@@ -66,9 +66,9 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ollama is unavailable: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Ollama is unavailable: $e')));
       }
     } finally {
       if (mounted) setState(() => _isAiSending = false);
@@ -89,16 +89,20 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
       final username = user.email?.split('@')[0] ?? 'User';
       try {
         await firestore.sendGlobalMessage(
-            user.uid, username, text, _selectedImageBytes);
+          user.uid,
+          username,
+          text,
+          _selectedImageBytes,
+        );
         _messageController.clear();
         setState(() {
           _selectedImageBytes = null;
         });
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error sending message: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error sending message: $e')));
         }
       } finally {
         if (mounted) {
@@ -114,13 +118,17 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
     showSearch<UserModel?>(
       context: context,
       delegate: UserSearchDelegate(
-          firestore: firestore, currentUserId: currentUserId),
+        firestore: firestore,
+        currentUserId: currentUserId,
+      ),
     ).then((selected) {
       if (selected != null && mounted) {
         final chatId = firestore.getChatRoomId(currentUserId, selected.id);
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => ChatScreen(chatId: chatId, chatName: selected.name),
-        ));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ChatScreen(chatId: chatId, chatName: selected.name),
+          ),
+        );
       }
     });
   }
@@ -159,8 +167,10 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.public_rounded,
-                        color: AppColors.bgDarkest),
+                    child: const Icon(
+                      Icons.public_rounded,
+                      color: AppColors.bgDarkest,
+                    ),
                   ),
                   const SizedBox(width: 14),
                   const Expanded(
@@ -171,7 +181,13 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                           'Global Chat',
                           style: TextStyle(
                             color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Copernicus',
+                            fontFamilyFallback: [
+                              'Tiempos Headline',
+                              'Cormorant Garamond',
+                              'serif',
+                            ],
+                            fontWeight: FontWeight.w400,
                             fontSize: 22,
                             letterSpacing: -0.5,
                           ),
@@ -179,7 +195,9 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         Text(
                           'Everyone, everywhere',
                           style: TextStyle(
-                              color: AppColors.textMuted, fontSize: 12),
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -191,12 +209,17 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: AppColors.glassBg,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color: AppColors.glassBorder, width: 1),
+                          color: AppColors.glassBorder,
+                          width: 1,
+                        ),
                       ),
-                      child: const Icon(Icons.search_rounded,
-                          color: AppColors.neonCyan, size: 22),
+                      child: const Icon(
+                        Icons.search_rounded,
+                        color: AppColors.neonCyan,
+                        size: 22,
+                      ),
                     ),
                   ),
                 ],
@@ -214,15 +237,15 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: AppColors.neonCyan),
+                        color: AppColors.neonCyan,
+                      ),
                     );
                   }
                   if (snapshot.hasError) {
                     return Center(
                       child: Text(
                         'Error loading security alerts: ${snapshot.error}',
-                        style:
-                            const TextStyle(color: AppColors.textSecondary),
+                        style: const TextStyle(color: AppColors.textSecondary),
                       ),
                     );
                   }
@@ -237,7 +260,8 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                           ConnectionState.waiting) {
                         return const Center(
                           child: CircularProgressIndicator(
-                              color: AppColors.neonCyan),
+                            color: AppColors.neonCyan,
+                          ),
                         );
                       }
                       if (messageSnapshot.hasError) {
@@ -245,7 +269,8 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                           child: Text(
                             'Error loading chat: ${messageSnapshot.error}',
                             style: const TextStyle(
-                                color: AppColors.textSecondary),
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         );
                       }
@@ -256,19 +281,28 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.forum_rounded,
-                                  size: 56,
-                                  color: AppColors.neonCyan
-                                      .withValues(alpha: 0.3)),
+                              Icon(
+                                Icons.forum_rounded,
+                                size: 56,
+                                color: AppColors.neonCyan.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
                               const SizedBox(height: 12),
-                              Text('No messages yet',
-                                  style: TextStyle(color: AppColors.textMuted)),
+                              Text(
+                                'No messages yet',
+                                style: TextStyle(color: AppColors.textMuted),
+                              ),
                               const SizedBox(height: 4),
-                              Text('Start the conversation!',
-                                  style: TextStyle(
-                                      color: AppColors.neonCyan
-                                          .withValues(alpha: 0.6),
-                                      fontSize: 13)),
+                              Text(
+                                'Start the conversation!',
+                                style: TextStyle(
+                                  color: AppColors.neonCyan.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                         );
@@ -278,12 +312,14 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         reverse: true,
                         padding: const EdgeInsets.only(bottom: 8),
                         children: [
-                          ..._aiReplies.map((reply) => ChatBubble(
-                                text: reply,
-                                senderName: _selectedAiModel,
-                                timestamp: DateTime.now(),
-                                isMe: false,
-                              )),
+                          ..._aiReplies.map(
+                            (reply) => ChatBubble(
+                              text: reply,
+                              senderName: _selectedAiModel,
+                              timestamp: DateTime.now(),
+                              isMe: false,
+                            ),
+                          ),
                           ...messages.map((msg) {
                             if (msg.type == 'security_alert') {
                               final alert = SecurityAlertModel(
@@ -308,7 +344,9 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                             );
                           }),
                           ...alertDocs.map((doc) {
-                            final alert = SecurityAlertModel.fromJson(doc.data());
+                            final alert = SecurityAlertModel.fromJson(
+                              doc.data(),
+                            );
                             return SecurityAlertCard(
                               key: ValueKey('security-alert-${doc.id}'),
                               alert: alert,
@@ -372,8 +410,11 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                             width: 1,
                           ),
                         ),
-                        child: const Icon(Icons.close,
-                            color: AppColors.danger, size: 16),
+                        child: const Icon(
+                          Icons.close,
+                          color: AppColors.danger,
+                          size: 16,
+                        ),
                       ),
                     ),
                   ],
@@ -392,8 +433,10 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                       width: 1,
                     ),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
@@ -403,25 +446,35 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                             color: AppColors.neonCyan.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.photo_outlined,
-                              color: AppColors.neonCyan
-                                  .withValues(alpha: 0.7),
-                              size: 20),
+                          child: Icon(
+                            Icons.photo_outlined,
+                            color: AppColors.neonCyan.withValues(alpha: 0.7),
+                            size: 20,
+                          ),
                         ),
                         onPressed: _pickImage,
                       ),
                       PopupMenuButton<String>(
                         tooltip: 'Choose local AI model',
                         initialValue: _selectedAiModel,
-                        onSelected: (model) => setState(() => _selectedAiModel = model),
+                        onSelected: (model) =>
+                            setState(() => _selectedAiModel = model),
                         itemBuilder: (context) => AiAgentService.localModels
-                            .map((model) => PopupMenuItem(value: model, child: Text(model)))
+                            .map(
+                              (model) => PopupMenuItem(
+                                value: model,
+                                child: Text(model),
+                              ),
+                            )
                             .toList(),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 6),
                           child: Text(
                             _selectedAiModel.split(':').first,
-                            style: const TextStyle(color: AppColors.neonCyan, fontSize: 11),
+                            style: const TextStyle(
+                              color: AppColors.neonCyan,
+                              fontSize: 11,
+                            ),
                           ),
                         ),
                       ),
@@ -430,7 +483,9 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         onPressed: _askLocalAi,
                         icon: Icon(
                           Icons.auto_awesome,
-                          color: _isAiSending ? AppColors.textMuted : AppColors.neonCyan,
+                          color: _isAiSending
+                              ? AppColors.textMuted
+                              : AppColors.neonCyan,
                           size: 19,
                         ),
                       ),
@@ -438,14 +493,20 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                         child: TextField(
                           controller: _messageController,
                           style: const TextStyle(
-                              color: AppColors.textPrimary, fontSize: 15),
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Type a message...',
                             hintStyle: TextStyle(
-                                color: AppColors.textMuted, fontSize: 15),
+                              color: AppColors.textMuted,
+                              fontSize: 15,
+                            ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 10),
+                              horizontal: 8,
+                              vertical: 10,
+                            ),
                           ),
                         ),
                       ),
@@ -476,8 +537,11 @@ class _GlobalChatTabState extends State<GlobalChatTab> {
                                     ),
                                   ],
                                 ),
-                                child: const Icon(Icons.send_rounded,
-                                    color: AppColors.bgDarkest, size: 20),
+                                child: const Icon(
+                                  Icons.send_rounded,
+                                  color: AppColors.bgDarkest,
+                                  size: 20,
+                                ),
                               ),
                             ),
                     ],
@@ -499,8 +563,7 @@ class UserSearchDelegate extends SearchDelegate<UserModel?> {
   final FirestoreService firestore;
   final String currentUserId;
 
-  UserSearchDelegate(
-      {required this.firestore, required this.currentUserId});
+  UserSearchDelegate({required this.firestore, required this.currentUserId});
 
   @override
   String? get searchFieldLabel => 'Search users...';
@@ -533,22 +596,25 @@ class UserSearchDelegate extends SearchDelegate<UserModel?> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(
-                child:
-                    CircularProgressIndicator(color: AppColors.neonCyan));
+              child: CircularProgressIndicator(color: AppColors.neonCyan),
+            );
           }
           final docs = snapshot.data!.docs
               .where((d) => d.id != currentUserId)
               .toList();
           final users = docs
-              .map((d) => UserModel.fromMap(
-                  d.data() as Map<String, dynamic>, d.id))
+              .map(
+                (d) =>
+                    UserModel.fromMap(d.data() as Map<String, dynamic>, d.id),
+              )
               .toList();
           final filtered = query.isEmpty
               ? users
               : users
-                  .where((u) =>
-                      u.name.toLowerCase().contains(query.toLowerCase()))
-                  .toList();
+                    .where(
+                      (u) => u.name.toLowerCase().contains(query.toLowerCase()),
+                    )
+                    .toList();
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: filtered.length,
@@ -565,13 +631,17 @@ class UserSearchDelegate extends SearchDelegate<UserModel?> {
                         ? NetworkImage(user.photoUrl!)
                         : null,
                   ),
-                  title: Text(user.name,
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600)),
-                  subtitle: Text(user.id,
-                      style:
-                          const TextStyle(color: AppColors.textMuted)),
+                  title: Text(
+                    user.name,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    user.id,
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
                   onTap: () => close(context, user),
                 ),
               );

@@ -25,12 +25,10 @@ class PrimaryButton extends StatelessWidget {
         onTap: isDisabled ? null : onPressed,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: 42,
+          height: 40,
           decoration: BoxDecoration(
-            gradient: isDisabled ? null : AppColors.primaryGradient,
-            color: isDisabled ? AppColors.bgLight : null,
-            borderRadius: BorderRadius.circular(3),
-            border: Border.all(color: AppColors.glassBorder),
+            color: isDisabled ? AppColors.primaryDisabled : AppColors.primary,
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
             child: isLoading
@@ -52,9 +50,11 @@ class PrimaryButton extends StatelessWidget {
                       Text(
                         text,
                         style: const TextStyle(
+                          fontFamily: 'StyreneB',
+                          fontFamilyFallback: ['Inter', 'sans-serif'],
                           color: Colors.white,
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

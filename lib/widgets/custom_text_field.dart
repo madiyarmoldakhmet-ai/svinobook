@@ -29,7 +29,7 @@ class CustomTextField extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.glassBg,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.glassBorder, width: 1),
       ),
       child: TextField(
@@ -38,16 +38,23 @@ class CustomTextField extends StatelessWidget {
         keyboardType: keyboardType,
         textInputAction: textInputAction,
         onEditingComplete: onEditingComplete,
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
-        cursorColor: AppColors.neonCyan,
+        style: const TextStyle(
+          fontFamily: 'StyreneB',
+          fontFamilyFallback: ['Inter', 'sans-serif'],
+          color: AppColors.textPrimary,
+          fontSize: 16,
+        ),
+        cursorColor: AppColors.primary,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: AppColors.textMuted),
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 10,
+          ),
         ),
       ),
     );

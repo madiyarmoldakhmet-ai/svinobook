@@ -47,9 +47,9 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -75,7 +75,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.neonCyan.withValues(alpha: 0.4),
@@ -98,9 +98,15 @@ class _AuthScreenState extends State<AuthScreen> {
                       'svinobook',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -1.5,
+                        fontFamily: 'Copernicus',
+                        fontFamilyFallback: [
+                          'Tiempos Headline',
+                          'Cormorant Garamond',
+                          'serif',
+                        ],
+                        fontSize: 48,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: -1,
                         color: Colors.white,
                       ),
                     ),
@@ -122,15 +128,18 @@ class _AuthScreenState extends State<AuthScreen> {
                   // ── Form Card ──
                   GlassCard(
                     padding: const EdgeInsets.all(24),
-                    borderRadius: 24,
+                    borderRadius: 16,
                     child: Column(
                       children: [
                         if (!_isLogin) ...[
                           CustomTextField(
                             controller: _usernameController,
                             hintText: 'Username',
-                            prefixIcon: const Icon(Icons.person_outline,
-                                color: AppColors.neonCyan, size: 20),
+                            prefixIcon: const Icon(
+                              Icons.person_outline,
+                              color: AppColors.neonCyan,
+                              size: 20,
+                            ),
                           ),
                           const SizedBox(height: 14),
                         ],
@@ -138,16 +147,22 @@ class _AuthScreenState extends State<AuthScreen> {
                           controller: _emailController,
                           hintText: 'Email address',
                           keyboardType: TextInputType.emailAddress,
-                          prefixIcon: const Icon(Icons.mail_outline,
-                              color: AppColors.neonCyan, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.mail_outline,
+                            color: AppColors.neonCyan,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(height: 14),
                         CustomTextField(
                           controller: _passwordController,
                           hintText: 'Password',
                           obscureText: _obscurePassword,
-                          prefixIcon: const Icon(Icons.lock_outline,
-                              color: AppColors.neonCyan, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.lock_outline,
+                            color: AppColors.neonCyan,
+                            size: 20,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -156,8 +171,9 @@ class _AuthScreenState extends State<AuthScreen> {
                               color: AppColors.textMuted,
                               size: 20,
                             ),
-                            onPressed: () => setState(() =>
-                                _obscurePassword = !_obscurePassword),
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),

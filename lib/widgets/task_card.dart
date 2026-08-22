@@ -14,11 +14,11 @@ class TaskCard extends StatelessWidget {
   Color _priorityColor(String priority) {
     switch (priority.toLowerCase()) {
       case 'high':
-        return Colors.red.shade300;
+        return AppColors.danger;
       case 'low':
-        return Colors.green.shade300;
+        return AppColors.success;
       default:
-        return Colors.orange.shade300;
+        return AppColors.warning;
     }
   }
 
@@ -32,16 +32,13 @@ class TaskCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.bgMid,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.glassBorder,
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.glassBorder, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -51,12 +48,17 @@ class TaskCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: _priorityColor(task.priority).withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(
-                    color: _priorityColor(task.priority).withValues(alpha: 0.35),
+                    color: _priorityColor(
+                      task.priority,
+                    ).withValues(alpha: 0.35),
                     width: 1,
                   ),
                 ),
@@ -71,17 +73,20 @@ class TaskCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isDone
-                      ? Colors.green.withValues(alpha: 0.2)
-                      : AppColors.neonCyan.withValues(alpha: 0.12),
+                      ? AppColors.success.withValues(alpha: 0.14)
+                      : AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   isDone ? 'Done' : 'Open',
                   style: TextStyle(
-                    color: isDone ? Colors.green.shade300 : AppColors.neonCyan,
+                    color: isDone ? AppColors.success : AppColors.primary,
                     fontWeight: FontWeight.w700,
                     fontSize: 11,
                   ),
@@ -121,7 +126,11 @@ class TaskCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.event_rounded, size: 16, color: AppColors.neonCyan),
+                const Icon(
+                  Icons.event_rounded,
+                  size: 16,
+                  color: AppColors.neonCyan,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Due ${DateFormat.yMMMd().format(task.dueDate!)}',
@@ -136,11 +145,7 @@ class TaskCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(
-                Icons.person_rounded,
-                size: 14,
-                color: AppColors.textMuted,
-              ),
+              Icon(Icons.person_rounded, size: 14, color: AppColors.textMuted),
               const SizedBox(width: 4),
               Text(
                 task.assigneeName,

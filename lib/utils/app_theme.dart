@@ -7,50 +7,63 @@ class AppColors {
   AppColors._();
 
   // ── DESIGN.md surfaces ──
-  static const bgDarkest = Color(0xFFF4EDE4);
-  static const bgDark = Color(0xFFF9F0FF);
-  static const bgMid = Color(0xFFFFFFFF);
-  static const bgLight = Color(0xFFF9F0FF);
+  static const canvas = Color(0xFFFAF9F5);
+  static const surfaceSoft = Color(0xFFF5F0E8);
+  static const surfaceCard = Color(0xFFEFE9DE);
+  static const surfaceCreamStrong = Color(0xFFE8E0D2);
+  static const surfaceDark = Color(0xFF181715);
+  static const surfaceDarkElevated = Color(0xFF252320);
+  static const surfaceDarkSoft = Color(0xFF1F1E1B);
+  static const bgDarkest = canvas;
+  static const bgDark = surfaceSoft;
+  static const bgMid = canvas;
+  static const bgLight = surfaceSoft;
 
-  // ── Aubergine primary ──
-  static const primary = Color(0xFF4A154B);
-  static const primaryDeep = Color(0xFF481A54);
-  static const primaryPress = Color(0xFF611F69);
-  static const primaryTint = Color(0xFF592466);
+  // ── Warm coral primary ──
+  static const primary = Color(0xFFCC785C);
+  static const primaryActive = Color(0xFFA9583E);
+  static const primaryDisabled = Color(0xFFE6DFD8);
+  static const primaryDeep = Color(0xFF252523);
+  static const primaryPress = primaryActive;
+  static const primaryTint = Color(0xFFE8A55A);
+  static const onDark = Color(0xFFFAF9F5);
   static const neonCyan = primary;
   static const neonBlue = primaryTint;
   static const neonPurple = primaryTint;
-  static const neonGreen = Color(0xFF007A5A);
+  static const neonGreen = Color(0xFF5DB8A6);
 
   // ── Glassmorphism ──
   static const glassBg = Color(0xFFFFFFFF);
-  static const glassBorder = Color(0xFFE6E6E6);
-  static const glassHighlight = Color(0xFFF9F0FF);
+  static const glassBorder = Color(0xFFE6DFD8);
+  static const glassHighlight = Color(0xFFEBE6DF);
 
   // ── Semantic ──
-  static const textPrimary = Color(0xFF1D1D1D);
-  static const textSecondary = Color(0xFF696969);
-  static const textMuted = Color(0xFF696969);
-  static const danger = Color(0xFFCC4117);
-  static const success = Color(0xFF007A5A);
+  static const textPrimary = Color(0xFF141413);
+  static const textStrong = Color(0xFF252523);
+  static const textSecondary = Color(0xFF3D3D3A);
+  static const textMuted = Color(0xFF6C6A64);
+  static const textMutedSoft = Color(0xFF8E8B82);
+  static const danger = Color(0xFFC64545);
+  static const success = Color(0xFF5DB872);
+  static const warning = Color(0xFFD4A017);
 
   // ── Gradients ──
   static const primaryGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [primaryTint, primary],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primary, primaryActive],
   );
 
   static const accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primaryTint, primary],
+    colors: [primary, primaryActive],
   );
 
   static const backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFF9F0FF), Colors.white, Color(0xFFF4EDE4)],
+    colors: [canvas, surfaceSoft, canvas],
     stops: [0.0, 0.5, 1.0],
   );
 }
@@ -74,50 +87,52 @@ class AppTheme {
 
     const base = TextTheme(
       displayLarge: TextStyle(
-        fontFamily: 'Salesforce-Avant-Garde',
-        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        fontFamily: 'Copernicus',
+        fontFamilyFallback: ['Tiempos Headline', 'Cormorant Garamond', 'serif'],
         color: AppColors.textPrimary,
-        fontSize: 32,
-        height: 1.25,
-        fontWeight: FontWeight.w700,
+        fontSize: 48,
+        height: 1.1,
+        letterSpacing: -1,
+        fontWeight: FontWeight.w400,
       ),
       headlineMedium: TextStyle(
-        fontFamily: 'Salesforce-Avant-Garde',
-        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        fontFamily: 'Copernicus',
+        fontFamilyFallback: ['Tiempos Headline', 'Cormorant Garamond', 'serif'],
         color: AppColors.textPrimary,
-        fontSize: 24,
-        height: 1.33,
-        fontWeight: FontWeight.w700,
+        fontSize: 36,
+        height: 1.15,
+        letterSpacing: -0.5,
+        fontWeight: FontWeight.w400,
       ),
       titleLarge: TextStyle(
-        fontFamily: 'Salesforce-Avant-Garde',
-        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        fontFamily: 'StyreneB',
+        fontFamilyFallback: ['Inter', 'sans-serif'],
         color: AppColors.textPrimary,
         fontSize: 22,
-        height: 1.4,
-        fontWeight: FontWeight.w600,
+        height: 1.3,
+        fontWeight: FontWeight.w500,
       ),
       bodyLarge: TextStyle(
-        fontFamily: 'Salesforce-Sans',
-        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        fontFamily: 'StyreneB',
+        fontFamilyFallback: ['Inter', 'sans-serif'],
         color: AppColors.textPrimary,
-        fontSize: 18,
+        fontSize: 16,
         height: 1.55,
       ),
       bodyMedium: TextStyle(
-        fontFamily: 'Salesforce-Sans',
-        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        fontFamily: 'StyreneB',
+        fontFamilyFallback: ['Inter', 'sans-serif'],
         color: AppColors.textSecondary,
-        fontSize: 16,
+        fontSize: 14,
         height: 1.55,
       ),
       labelLarge: TextStyle(
-        fontFamily: 'Salesforce-Sans',
-        fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+        fontFamily: 'StyreneB',
+        fontFamilyFallback: ['Inter', 'sans-serif'],
         color: AppColors.textPrimary,
-        fontWeight: FontWeight.w700,
-        fontSize: 16,
-        height: 1.38,
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+        height: 1,
       ),
     );
 
@@ -134,48 +149,46 @@ class AppTheme {
         centerTitle: false,
         titleTextStyle: const TextStyle(
           color: Colors.white,
-          fontFamily: 'Salesforce-Avant-Garde',
-          fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
+          fontFamily: 'StyreneB',
+          fontFamilyFallback: ['Inter', 'sans-serif'],
           fontSize: 20,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w500,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.glassBg,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 11,
+          horizontal: 14,
+          vertical: 10,
         ),
         hintStyle: TextStyle(color: AppColors.textMuted),
         labelStyle: TextStyle(color: AppColors.textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4)),
+          borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: BorderSide(color: AppColors.glassBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4)),
+          borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: BorderSide(color: AppColors.glassBorder, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4)),
+          borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: const BorderSide(color: AppColors.neonCyan, width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.neonCyan,
-          foregroundColor: AppColors.bgDarkest,
-          elevation: 1,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(90),
-          ),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: const TextStyle(
-            fontFamily: 'Salesforce-Sans',
-            fontFamilyFallback: ['system-ui', '-apple-system', 'sans-serif'],
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
+            fontFamily: 'StyreneB',
+            fontFamilyFallback: ['Inter', 'sans-serif'],
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -242,7 +255,7 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final br = BorderRadius.circular(borderRadius > 3 ? 4 : borderRadius);
+    final br = BorderRadius.circular(borderRadius);
     return Container(
       margin: margin,
       child: ClipRRect(

@@ -47,9 +47,9 @@ class _ProfileTabState extends State<ProfileTab> {
     final status = _statusController.text.trim();
 
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Name cannot be empty')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Name cannot be empty')));
       return;
     }
 
@@ -75,9 +75,9 @@ class _ProfileTabState extends State<ProfileTab> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating profile: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating profile: $e')));
       }
     } finally {
       if (mounted) {
@@ -100,8 +100,10 @@ class _ProfileTabState extends State<ProfileTab> {
       return Container(
         decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: const Center(
-          child: Text('Not logged in',
-              style: TextStyle(color: AppColors.textSecondary)),
+          child: Text(
+            'Not logged in',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
         ),
       );
     }
@@ -125,14 +127,15 @@ class _ProfileTabState extends State<ProfileTab> {
                 !snapshot.hasData ||
                 !snapshot.data!.exists) {
               return const Center(
-                child: Text('Error loading profile data',
-                    style: TextStyle(color: AppColors.textSecondary)),
+                child: Text(
+                  'Error loading profile data',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
               );
             }
 
             final data = snapshot.data!.data() as Map<String, dynamic>;
-            final currentName =
-                data['name'] ?? data['username'] ?? 'User';
+            final currentName = data['name'] ?? data['username'] ?? 'User';
             final photoUrl = data['photoUrl'] as String?;
             final currentBackground =
                 data['chatBackgroundUrl'] as String? ?? '';
@@ -151,11 +154,10 @@ class _ProfileTabState extends State<ProfileTab> {
             final avatarImage = _selectedAvatarBytes != null
                 ? MemoryImage(_selectedAvatarBytes!)
                 : (photoUrl != null ? NetworkImage(photoUrl) : null)
-                    as ImageProvider?;
+                      as ImageProvider?;
 
             return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                  20, topPad + 16, 20, 120),
+              padding: EdgeInsets.fromLTRB(20, topPad + 16, 20, 120),
               child: Column(
                 children: [
                   // ── Header ──
@@ -169,21 +171,28 @@ class _ProfileTabState extends State<ProfileTab> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.neonCyan
-                                  .withValues(alpha: 0.3),
+                              color: AppColors.neonCyan.withValues(alpha: 0.3),
                               blurRadius: 12,
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.person_rounded,
-                            color: AppColors.bgDarkest),
+                        child: const Icon(
+                          Icons.person_rounded,
+                          color: AppColors.bgDarkest,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       const Text(
                         'Profile',
                         style: TextStyle(
                           color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
+                          fontFamily: 'Copernicus',
+                          fontFamilyFallback: [
+                            'Tiempos Headline',
+                            'Cormorant Garamond',
+                            'serif',
+                          ],
+                          fontWeight: FontWeight.w400,
                           fontSize: 28,
                           letterSpacing: -0.5,
                         ),
@@ -196,15 +205,17 @@ class _ProfileTabState extends State<ProfileTab> {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: AppColors.danger.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: AppColors.danger
-                                  .withValues(alpha: 0.3),
+                              color: AppColors.danger.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
-                          child: const Icon(Icons.logout_rounded,
-                              color: AppColors.danger, size: 22),
+                          child: const Icon(
+                            Icons.logout_rounded,
+                            color: AppColors.danger,
+                            size: 22,
+                          ),
                         ),
                       ),
                     ],
@@ -223,12 +234,13 @@ class _ProfileTabState extends State<ProfileTab> {
                           gradient: AppColors.primaryGradient,
                           image: avatarImage != null
                               ? DecorationImage(
-                                  image: avatarImage, fit: BoxFit.cover)
+                                  image: avatarImage,
+                                  fit: BoxFit.cover,
+                                )
                               : null,
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  AppColors.neonCyan.withValues(alpha: 0.4),
+                              color: AppColors.neonCyan.withValues(alpha: 0.4),
                               blurRadius: 24,
                               spreadRadius: 2,
                             ),
@@ -259,10 +271,15 @@ class _ProfileTabState extends State<ProfileTab> {
                             gradient: AppColors.primaryGradient,
                             shape: BoxShape.circle,
                             border: Border.all(
-                                color: AppColors.bgDarkest, width: 3),
+                              color: AppColors.bgDarkest,
+                              width: 3,
+                            ),
                           ),
-                          child: const Icon(Icons.camera_alt_rounded,
-                              color: AppColors.bgDarkest, size: 18),
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            color: AppColors.bgDarkest,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ],
@@ -288,8 +305,11 @@ class _ProfileTabState extends State<ProfileTab> {
                         CustomTextField(
                           controller: _nameController,
                           hintText: 'Enter your name',
-                          prefixIcon: const Icon(Icons.person_outline,
-                              color: AppColors.neonCyan, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.person_outline,
+                            color: AppColors.neonCyan,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -304,8 +324,11 @@ class _ProfileTabState extends State<ProfileTab> {
                         CustomTextField(
                           controller: _statusController,
                           hintText: 'e.g., Coding, Busy...',
-                          prefixIcon: const Icon(Icons.chat_bubble_outline,
-                              color: AppColors.neonCyan, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.chat_bubble_outline,
+                            color: AppColors.neonCyan,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -321,8 +344,11 @@ class _ProfileTabState extends State<ProfileTab> {
                           controller: _backgroundController,
                           hintText: 'https://example.com/image.jpg',
                           keyboardType: TextInputType.url,
-                          prefixIcon: const Icon(Icons.wallpaper,
-                              color: AppColors.neonCyan, size: 20),
+                          prefixIcon: const Icon(
+                            Icons.wallpaper,
+                            color: AppColors.neonCyan,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -336,23 +362,31 @@ class _ProfileTabState extends State<ProfileTab> {
                         const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.glassBg,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                                color: AppColors.glassBorder, width: 1),
+                              color: AppColors.glassBorder,
+                              width: 1,
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.mail_outline,
-                                  color: AppColors.textMuted, size: 20),
+                              const Icon(
+                                Icons.mail_outline,
+                                color: AppColors.textMuted,
+                                size: 20,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   currentUser.email ?? '',
                                   style: const TextStyle(
-                                      color: AppColors.textMuted),
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
                               ),
                             ],

@@ -17,10 +17,14 @@ class _TasksTabState extends State<TasksTab> {
 
   List<TaskCardModel> _applyFilter(List<TaskCardModel> tasks) {
     if (_filter == 'Open') {
-      return tasks.where((task) => task.status.toLowerCase() == 'open').toList();
+      return tasks
+          .where((task) => task.status.toLowerCase() == 'open')
+          .toList();
     }
     if (_filter == 'Done') {
-      return tasks.where((task) => task.status.toLowerCase() == 'done').toList();
+      return tasks
+          .where((task) => task.status.toLowerCase() == 'done')
+          .toList();
     }
     return tasks;
   }
@@ -51,7 +55,10 @@ class _TasksTabState extends State<TasksTab> {
                       gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.checklist_rounded, color: AppColors.bgDarkest),
+                    child: const Icon(
+                      Icons.checklist_rounded,
+                      color: AppColors.bgDarkest,
+                    ),
                   ),
                   const SizedBox(width: 14),
                   const Expanded(
@@ -89,7 +96,9 @@ class _TasksTabState extends State<TasksTab> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: CircularProgressIndicator(color: AppColors.neonCyan),
+                      child: CircularProgressIndicator(
+                        color: AppColors.neonCyan,
+                      ),
                     );
                   }
                   if (snapshot.hasError) {
@@ -111,14 +120,20 @@ class _TasksTabState extends State<TasksTab> {
                     );
                   }
 
-                  final openTasks = tasks.where((task) => task.status.toLowerCase() == 'open').toList();
-                  final doneTasks = tasks.where((task) => task.status.toLowerCase() == 'done').toList();
+                  final openTasks = tasks
+                      .where((task) => task.status.toLowerCase() == 'open')
+                      .toList();
+                  final doneTasks = tasks
+                      .where((task) => task.status.toLowerCase() == 'done')
+                      .toList();
 
                   return ListView(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 110),
                     children: [
-                      if (openTasks.isNotEmpty) _buildSection('In work', openTasks),
-                      if (doneTasks.isNotEmpty) _buildSection('Completed', doneTasks),
+                      if (openTasks.isNotEmpty)
+                        _buildSection('In work', openTasks),
+                      if (doneTasks.isNotEmpty)
+                        _buildSection('Completed', doneTasks),
                     ],
                   );
                 },
@@ -159,7 +174,7 @@ class _TasksTabState extends State<TasksTab> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.bgMid,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.glassBorder, width: 1),
       ),
       child: Column(
@@ -199,15 +214,20 @@ class _TasksTabState extends State<TasksTab> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
-                  color: isDone ? Colors.green.withValues(alpha: 0.14) : AppColors.neonCyan.withValues(alpha: 0.12),
+                  color: isDone
+                      ? AppColors.success.withValues(alpha: 0.14)
+                      : AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   isDone ? 'Done' : 'In work',
                   style: TextStyle(
-                    color: isDone ? Colors.green.shade300 : AppColors.neonCyan,
+                    color: isDone ? AppColors.success : AppColors.primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
                   ),
@@ -215,13 +235,16 @@ class _TasksTabState extends State<TasksTab> {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: task.priority == 'High'
                       ? Colors.red.withValues(alpha: 0.14)
                       : task.priority == 'Low'
-                          ? Colors.green.withValues(alpha: 0.14)
-                          : Colors.orange.withValues(alpha: 0.14),
+                      ? Colors.green.withValues(alpha: 0.14)
+                      : Colors.orange.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -230,8 +253,8 @@ class _TasksTabState extends State<TasksTab> {
                     color: task.priority == 'High'
                         ? Colors.red.shade300
                         : task.priority == 'Low'
-                            ? Colors.green.shade300
-                            : Colors.orange.shade300,
+                        ? Colors.green.shade300
+                        : Colors.orange.shade300,
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
                   ),

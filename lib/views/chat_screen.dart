@@ -506,7 +506,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             // ── The floating glass input bar ──
             ClipRRect(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
                 decoration: BoxDecoration(
                   color: _glassBg,

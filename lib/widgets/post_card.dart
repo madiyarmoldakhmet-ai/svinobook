@@ -11,16 +11,9 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      borderRadius: 4,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.08),
-          blurRadius: 2,
-          offset: const Offset(0, 1),
-        ),
-      ],
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(24),
+      borderRadius: 12,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -29,8 +22,8 @@ class PostCard extends StatelessWidget {
               GradientAvatar(
                 name: post.authorName,
                 radius: 22,
-                backgroundImage: (post.userPhotoUrl != null &&
-                        post.userPhotoUrl!.isNotEmpty)
+                backgroundImage:
+                    (post.userPhotoUrl != null && post.userPhotoUrl!.isNotEmpty)
                     ? NetworkImage(post.userPhotoUrl!)
                     : null,
               ),
@@ -45,6 +38,8 @@ class PostCard extends StatelessWidget {
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
+                        fontFamily: 'StyreneB',
+                        fontFamilyFallback: ['Inter', 'sans-serif'],
                       ),
                     ),
                     Text(
@@ -71,7 +66,7 @@ class PostCard extends StatelessWidget {
           if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
             const SizedBox(height: 14),
             ClipRRect(
-              borderRadius: BorderRadius.circular(3),
+              borderRadius: BorderRadius.circular(12),
               child: Image.network(
                 post.imageUrl!,
                 width: double.infinity,
@@ -82,7 +77,7 @@ class PostCard extends StatelessWidget {
                     height: 200,
                     decoration: BoxDecoration(
                       color: AppColors.glassBg,
-                      borderRadius: BorderRadius.circular(3),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
                       child: CircularProgressIndicator(
@@ -97,11 +92,14 @@ class PostCard extends StatelessWidget {
                     height: 200,
                     decoration: BoxDecoration(
                       color: AppColors.glassBg,
-                      borderRadius: BorderRadius.circular(3),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
-                      child: Icon(Icons.broken_image,
-                          size: 40, color: AppColors.textMuted),
+                      child: Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   );
                 },
@@ -112,24 +110,23 @@ class PostCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.neonCyan.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(3),
+              color: AppColors.surfaceCard,
+              borderRadius: BorderRadius.circular(9999),
               border: Border.all(
-                color: AppColors.neonCyan.withValues(alpha: 0.2),
+                color: AppColors.primary.withValues(alpha: 0.25),
                 width: 1,
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.favorite,
-                    color: AppColors.neonCyan.withValues(alpha: 0.8), size: 16),
+                const Icon(Icons.favorite, color: AppColors.primary, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   '${post.likes} Likes',
                   style: TextStyle(
-                    color: AppColors.neonCyan.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryActive,
+                    fontWeight: FontWeight.w500,
                     fontSize: 13,
                   ),
                 ),

@@ -25,7 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final SystemHealthService _systemHealthService;
   final CallService _callService = CallService();
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _incomingSubscription;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+  _incomingSubscription;
 
   @override
   void didChangeDependencies() {
@@ -41,15 +42,28 @@ class _HomeScreenState extends State<HomeScreen> {
       final callerId = data['callerId'] as String? ?? '';
       final callerName = data['callerName'] as String? ?? 'Svinobook user';
       final video = data['type'] != 'audio';
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => IncomingCallScreen(
-        callId: call.id,
-        callerName: callerName,
-        video: video,
-        onAccepted: () {
-          Navigator.of(context).pop();
-          Navigator.of(context).push(MaterialPageRoute(builder: (_) => CallScreen(callId: call.id, targetUserId: callerId, chatName: callerName, video: video)));
-        },
-      )));
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => IncomingCallScreen(
+            callId: call.id,
+            callerName: callerName,
+            video: video,
+            onAccepted: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => CallScreen(
+                    callId: call.id,
+                    targetUserId: callerId,
+                    chatName: callerName,
+                    video: video,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
     });
   }
 
@@ -90,10 +104,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (isDesktop)
                           _ClassicSidebar(
                             currentIndex: _currentIndex,
-                            onTap: (index) => setState(() => _currentIndex = index),
+                            onTap: (index) =>
+                                setState(() => _currentIndex = index),
                           ),
                         Expanded(
-                          child: IndexedStack(index: _currentIndex, children: _tabs),
+                          child: IndexedStack(
+                            index: _currentIndex,
+                            children: _tabs,
+                          ),
                         ),
                       ],
                     ),
@@ -120,7 +138,7 @@ class _ClassicTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 44,
-      color: AppColors.neonCyan,
+      color: AppColors.surfaceDark,
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1080),
@@ -130,7 +148,7 @@ class _ClassicTopBar extends StatelessWidget {
               const Text(
                 'svinobook',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.onDark,
                   fontSize: 19,
                   fontWeight: FontWeight.w700,
                 ),
@@ -142,13 +160,20 @@ class _ClassicTopBar extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Search',
-                    hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
-                    prefixIcon: const Icon(Icons.search, color: Colors.white, size: 17),
+                    hintStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      fontSize: 12,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 17,
+                    ),
                     filled: true,
                     fillColor: Colors.black.withValues(alpha: 0.12),
                     contentPadding: EdgeInsets.zero,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(3),
+                      borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -156,7 +181,11 @@ class _ClassicTopBar extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+              const Icon(
+                Icons.notifications_none,
+                color: Colors.white,
+                size: 20,
+              ),
               const SizedBox(width: 14),
             ],
           ),
@@ -196,18 +225,25 @@ class _ClassicSidebar extends StatelessWidget {
               return InkWell(
                 onTap: () => onTap(index),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  color: selected ? const Color(0xFFDCE8F3) : Colors.transparent,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  color: selected ? AppColors.surfaceCard : Colors.transparent,
                   child: Row(
                     children: [
-                      Icon(item.icon, size: 17, color: AppColors.neonCyan),
+                      Icon(item.icon, size: 17, color: AppColors.primary),
                       const SizedBox(width: 9),
                       Text(
                         item.label,
                         style: TextStyle(
-                          color: selected ? AppColors.textPrimary : AppColors.neonCyan,
+                          color: selected
+                              ? AppColors.textPrimary
+                              : AppColors.textMuted,
                           fontSize: 13,
-                          fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w400,
                         ),
                       ),
                     ],
@@ -218,12 +254,18 @@ class _ClassicSidebar extends StatelessWidget {
             const Divider(height: 20),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('COMMUNITY', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
+              child: Text(
+                'COMMUNITY',
+                style: TextStyle(color: AppColors.textMuted, fontSize: 10),
+              ),
             ),
             const SizedBox(height: 8),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('Help  •  Settings', style: TextStyle(color: AppColors.neonCyan, fontSize: 12)),
+              child: Text(
+                'Help  •  Settings',
+                style: TextStyle(color: AppColors.neonCyan, fontSize: 12),
+              ),
             ),
           ],
         ),
@@ -252,10 +294,14 @@ class _GlassNavBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
       decoration: BoxDecoration(
-        color: AppColors.bgMid,
+        color: AppColors.canvas,
         border: Border.all(color: AppColors.glassBorder),
         boxShadow: const [
-          BoxShadow(color: Color(0x22000000), blurRadius: 3, offset: Offset(0, 1)),
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 3,
+            offset: Offset(0, 1),
+          ),
         ],
       ),
       child: Row(
@@ -269,19 +315,25 @@ class _GlassNavBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
               decoration: BoxDecoration(
-                color: selected ? const Color(0xFFE2EDF7) : Colors.transparent,
-                border: selected ? Border.all(color: const Color(0xFFB8CBDE)) : null,
-                borderRadius: BorderRadius.circular(3),
+                color: selected ? AppColors.surfaceCard : Colors.transparent,
+                border: selected
+                    ? Border.all(color: AppColors.glassBorder)
+                    : null,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(item.icon, color: selected ? AppColors.neonCyan : AppColors.textMuted, size: 19),
+                  Icon(
+                    item.icon,
+                    color: selected ? AppColors.primary : AppColors.textMuted,
+                    size: 19,
+                  ),
                   const SizedBox(height: 2),
                   Text(
                     item.label,
                     style: TextStyle(
-                      color: selected ? AppColors.neonCyan : AppColors.textMuted,
+                      color: selected ? AppColors.primary : AppColors.textMuted,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                       fontSize: 10,
                     ),

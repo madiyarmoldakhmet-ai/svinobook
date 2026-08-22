@@ -12,7 +12,7 @@ class SecurityAlertCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isCritical ? AppColors.danger : Colors.orange.shade300;
+    final accent = isCritical ? AppColors.danger : AppColors.warning;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -25,7 +25,7 @@ class SecurityAlertCard extends StatelessWidget {
               ? [AppColors.danger.withValues(alpha: 0.22), AppColors.bgMid]
               : [Colors.orange.withValues(alpha: 0.18), AppColors.bgMid],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: accent.withValues(alpha: 0.45), width: 1),
       ),
       child: Column(
@@ -40,7 +40,9 @@ class SecurityAlertCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  isCritical ? Icons.warning_amber_rounded : Icons.security_rounded,
+                  isCritical
+                      ? Icons.warning_amber_rounded
+                      : Icons.security_rounded,
                   color: accent,
                 ),
               ),
@@ -84,10 +86,7 @@ class SecurityAlertCard extends StatelessWidget {
             alignment: Alignment.bottomRight,
             child: Text(
               DateFormat.jm().format(alert.createdAt),
-              style: TextStyle(
-                fontSize: 11,
-                color: AppColors.textMuted,
-              ),
+              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
             ),
           ),
         ],

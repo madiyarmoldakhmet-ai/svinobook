@@ -45,7 +45,7 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
         child: Container(
           decoration: const BoxDecoration(
             color: AppColors.bgMid,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
@@ -66,7 +66,13 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                   'Share an Achievement',
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Copernicus',
+                    fontFamilyFallback: [
+                      'Tiempos Headline',
+                      'Cormorant Garamond',
+                      'serif',
+                    ],
+                    fontWeight: FontWeight.w400,
                     fontSize: 22,
                   ),
                 ),
@@ -79,23 +85,32 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                 CustomTextField(
                   controller: _titleController,
                   hintText: 'Title',
-                  prefixIcon: const Icon(Icons.title,
-                      color: AppColors.neonCyan, size: 20),
+                  prefixIcon: const Icon(
+                    Icons.title,
+                    color: AppColors.neonCyan,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 CustomTextField(
                   controller: _descController,
                   hintText: 'Description',
-                  prefixIcon: const Icon(Icons.description,
-                      color: AppColors.neonCyan, size: 20),
+                  prefixIcon: const Icon(
+                    Icons.description,
+                    color: AppColors.neonCyan,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 CustomTextField(
                   controller: _imageUrlController,
                   hintText: 'Image URL (optional)',
                   keyboardType: TextInputType.url,
-                  prefixIcon: const Icon(Icons.link,
-                      color: AppColors.neonCyan, size: 20),
+                  prefixIcon: const Icon(
+                    Icons.link,
+                    color: AppColors.neonCyan,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -170,9 +185,9 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
 
     if (mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Project shared! 🎉')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Project shared! 🎉')));
     }
   }
 
@@ -215,8 +230,10 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.explore_rounded,
-                        color: AppColors.bgDarkest),
+                    child: const Icon(
+                      Icons.explore_rounded,
+                      color: AppColors.bgDarkest,
+                    ),
                   ),
                   const SizedBox(width: 14),
                   const Expanded(
@@ -236,7 +253,7 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         gradient: AppColors.primaryGradient,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.neonCyan.withValues(alpha: 0.3),
@@ -244,8 +261,11 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.add_rounded,
-                          color: AppColors.bgDarkest, size: 24),
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: AppColors.bgDarkest,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ],
@@ -263,7 +283,8 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: AppColors.neonCyan),
+                        color: AppColors.neonCyan,
+                      ),
                     );
                   }
                   if (snapshot.hasError) {
@@ -288,22 +309,30 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.auto_awesome,
-                                  size: 64,
-                                  color: AppColors.neonCyan.withValues(alpha: 0.3)),
+                              Icon(
+                                Icons.auto_awesome,
+                                size: 64,
+                                color: AppColors.neonCyan.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
                               const SizedBox(height: 16),
                               Text(
                                 'Nothing here yet',
                                 style: TextStyle(
-                                    color: AppColors.textMuted, fontSize: 16),
+                                  color: AppColors.textMuted,
+                                  fontSize: 16,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'Be the first to share!',
                                 style: TextStyle(
-                                    color: AppColors.neonCyan
-                                        .withValues(alpha: 0.6),
-                                    fontSize: 13),
+                                  color: AppColors.neonCyan.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -322,7 +351,7 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                         final likes = data['likes'] ?? 0;
                         final timestamp =
                             (data['createdAt'] as Timestamp?)?.toDate() ??
-                                DateTime.now();
+                            DateTime.now();
 
                         combined.add(
                           GlassCard(
@@ -338,7 +367,8 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                                       GradientAvatar(
                                         name: userName,
                                         radius: 20,
-                                        backgroundImage: (userPhotoUrl != null &&
+                                        backgroundImage:
+                                            (userPhotoUrl != null &&
                                                 userPhotoUrl.isNotEmpty)
                                             ? NetworkImage(userPhotoUrl)
                                             : null,
@@ -362,8 +392,9 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                                                   .add_jm()
                                                   .format(timestamp),
                                               style: TextStyle(
-                                                  color: AppColors.textMuted,
-                                                  fontSize: 12),
+                                                color: AppColors.textMuted,
+                                                fontSize: 12,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -374,7 +405,8 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                                 if (imageUrl != null && imageUrl.isNotEmpty)
                                   ClipRRect(
                                     borderRadius: const BorderRadius.vertical(
-                                        bottom: Radius.circular(0)),
+                                      bottom: Radius.circular(0),
+                                    ),
                                     child: Image.network(
                                       imageUrl,
                                       width: double.infinity,
@@ -385,22 +417,27 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                                         color: AppColors.glassBg,
                                         child: const Center(
                                           child: CircularProgressIndicator(
-                                              color: AppColors.neonCyan),
+                                            color: AppColors.neonCyan,
+                                          ),
                                         ),
                                       ),
                                       errorBuilder: (c, e, s) => Container(
                                         height: 120,
                                         color: AppColors.glassBg,
                                         child: const Center(
-                                            child: Icon(Icons.broken_image,
-                                                color: AppColors.textMuted)),
+                                          child: Icon(
+                                            Icons.broken_image,
+                                            color: AppColors.textMuted,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         title,
@@ -423,18 +460,25 @@ class _ProjectShowcaseViewState extends State<ProjectShowcaseView> {
                                   ),
                                 ),
                                 Divider(
-                                    color: AppColors.glassBorder, height: 1),
+                                  color: AppColors.glassBorder,
+                                  height: 1,
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
                                   child: Row(
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.local_fire_department,
-                                            color: AppColors.neonCyan
-                                                .withValues(alpha: 0.8)),
-                                        onPressed: () => _supportProject(
-                                            doc.id, likes),
+                                        icon: Icon(
+                                          Icons.local_fire_department,
+                                          color: AppColors.neonCyan.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                        ),
+                                        onPressed: () =>
+                                            _supportProject(doc.id, likes),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
