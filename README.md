@@ -45,4 +45,4 @@ flutter test
 flutter test --coverage
 ```
 
-Coverage currently measures the existing suite; focused service and screen tests should be added as Firebase mocks are introduced.
+The suite includes focused tests for media upload/picking and call state transitions using mocks and a fake Firestore. Coverage is written to `coverage/lcov.info`; the current suite is intentionally focused on service behavior and does not claim full UI or WebRTC coverage.
