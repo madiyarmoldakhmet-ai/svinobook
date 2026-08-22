@@ -36,14 +36,16 @@ class CallSession {
 
 class CallService {
   final FirebaseFirestore _db;
-  final FirebaseAuth _auth;
+  final FirebaseAuth? _auth;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _incomingSubscription;
 
   CallService({FirebaseFirestore? firestore, FirebaseAuth? auth})
       : _db = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+        _auth = auth;
 
-  String get _uid => _auth.currentUser?.uid ?? '';
+  FirebaseAuth get _firebaseAuth => _auth ?? FirebaseAuth.instance;
+
+  String get _uid => _auth?.currentUser?.uid ?? '';
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> listenForCalls() {
     if (_uid.isEmpty) return const Stream.empty();
@@ -67,7 +69,7 @@ class CallService {
     await session.peer.setLocalDescription(offer);
     await callRef.set({
       'callerId': _uid,
-      'callerName': _auth.currentUser?.displayName ?? _auth.currentUser?.email?.split('@').first ?? 'Svinobook user',
+      'callerName': _firebaseAuth.currentUser?.displayName ?? _firebaseAuth.currentUser?.email?.split('@').first ?? 'Svinobook user',
       'calleeId': targetUserId,
       'offer': {'sdp': offer.sdp, 'type': offer.type},
       'status': 'calling',

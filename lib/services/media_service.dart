@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
-import 'storage_service.dart';
+import 'package:svinobook/services/storage_service.dart';
 
 class PickedMedia {
   final Uint8List bytes;
@@ -12,9 +12,11 @@ class PickedMedia {
 
 class MediaService {
   final StorageService _storage;
-  final ImagePicker _picker = ImagePicker();
+  final ImagePicker _picker;
 
-  MediaService({StorageService? storage}) : _storage = storage ?? StorageService();
+  MediaService({StorageService? storage, ImagePicker? picker})
+      : _storage = storage ?? StorageService(),
+        _picker = picker ?? ImagePicker();
 
   Future<PickedMedia?> pickImage({ImageSource source = ImageSource.gallery}) async {
     final file = await _picker.pickImage(source: source, imageQuality: 78);
